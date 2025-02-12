@@ -1,0 +1,54 @@
+package foxo.flanty.proxyApi.REST.requests;
+
+import com.velocitypowered.api.proxy.Player;
+import foxo.flanty.proxyApi.settings.Config;
+import foxo.flanty.proxyApi.utils.SRUtils;
+import net.skinsrestorer.api.property.SkinProperty;
+import okhttp3.*;
+
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+
+import static foxo.flanty.proxyApi.settings.Endpoints.skinUpdate;
+import static foxo.flanty.proxyApi.settings.Language.apiResponseError;
+import static foxo.flanty.proxyApi.settings.Language.apiUnavailable;
+
+public class Skins {
+
+    public static CompletableFuture<Boolean> updateSkin(SkinProperty skinProperty, Player player) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        String texture = skinProperty.getValue();
+        String sign = skinProperty.getSignature();
+        String playerName = player.getUsername();
+        String skinUrl = SRUtils.textureDecode(skinProperty.getValue())[1];
+
+        String json = String.format(
+                "{\"texture\": \"%s\", \"sign\": \"%s\", \"player\": \"%s\", \"skin_url\": \"%s\"}",
+                texture, sign, playerName, skinUrl
+        );
+
+        OkHttpClient client = new OkHttpClient();
+        RequestBody body = RequestBody.create(json, MediaType.get("application/json; charset=utf-8"));
+        Request request = new Request.Builder().url(skinUpdate).put(body).build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Config.logger.error(apiUnavailable, e);
+                future.complete(false);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.isSuccessful()) {
+                    future.complete(true);
+                } else {
+                    Config.logger.error("{}{}", apiResponseError, response.code());
+                    future.complete(false);
+                }
+            }
+        });
+        return future;
+    }
+}
