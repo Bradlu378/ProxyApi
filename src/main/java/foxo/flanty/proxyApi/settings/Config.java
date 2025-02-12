@@ -13,4 +13,5 @@ public class Config {
     public static ProxyServer proxyServer;
     public static Logger logger;
     public static Map<String,String> passwords = new HashMap<>();
+    public static Map<String,String> lastIps = new HashMap<>();
 }

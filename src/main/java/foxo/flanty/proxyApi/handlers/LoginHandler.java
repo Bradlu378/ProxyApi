@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
+import org.mindrot.bcrypt.BCrypt;
 import org.slf4j.Logger;
 
 import java.time.Duration;
@@ -70,9 +71,16 @@ public class LoginHandler implements LimboSessionHandler {
     }
 
     @Override
-    public void onChat(String chat) {
-        if (chat.equals("go back")) {
-            player.disconnect();
+    public void onChat(String message) {
+        String[] args = message.split(" ");
+        switch (args[0]) {
+            case "login":
+                if(args.length == 2) {
+                    if (BCrypt.hashpw(args[1], BCrypt.gensalt()).equals(Config.passwords.get(player.getProxyPlayer().getUsername()))) {
+                        player.getProxyPlayer().disconnect(Component.empty());
+                    }
+                }
+                break;
         }
     }
     @Override

@@ -1,12 +1,7 @@
 package foxo.flanty.proxyApi.REST.endpoints;
 
-import com.velocitypowered.api.proxy.ProxyServer;
-import foxo.flanty.proxyApi.ProxyApi;
 import foxo.flanty.proxyApi.settings.Config;
-import foxo.flanty.proxyApi.utils.SRUtils;
 import io.javalin.http.Context;
-import net.skinsrestorer.api.property.SkinProperty;
-import net.skinsrestorer.api.property.SkinVariant;
 import org.json.JSONObject;
 
 public class Auth {
@@ -15,10 +10,14 @@ public class Auth {
 
         String nickname = json.optString("player", null);
         String hashedPassword = json.optString("password", null);
+        String ip = json.optString("ip", null);
         if (nickname == null | hashedPassword == null){
             ctx.status(400).result("Invalid request");;
             return;
         }
         Config.passwords.put(nickname, hashedPassword);
+        if (ip == null){
+            Config.lastIps.put(nickname, ip);
+        }
     }
 }

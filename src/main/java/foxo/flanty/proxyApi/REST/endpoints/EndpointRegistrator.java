@@ -24,7 +24,7 @@ public class EndpointRegistrator {
         }
         app = Javalin.create().start(7000);
         app.post("/proxy/set-skin", Skins::setSkin);
-        app.post("/proxy/auth/register", Auth::setPass);
+        app.put("/proxy/auth/password", Auth::setPass);
 
     }
     public void disable() {
