@@ -16,8 +16,7 @@ public class Auth {
             return;
         }
         Config.passwords.put(nickname, hashedPassword);
-        if (ip == null){
-            Config.lastIps.put(nickname, ip);
-        }
+        if (ip != null) Config.lastIps.put(nickname, ip);
+
     }
 }

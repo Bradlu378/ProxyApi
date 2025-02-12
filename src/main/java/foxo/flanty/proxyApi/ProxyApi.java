@@ -9,6 +9,7 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import foxo.flanty.proxyApi.REST.endpoints.EndpointRegistrator;
+import foxo.flanty.proxyApi.REST.requests.Auth;
 import foxo.flanty.proxyApi.listeners.EventRegistrator;
 import foxo.flanty.proxyApi.settings.Config;
 import net.elytrium.limboapi.api.Limbo;
@@ -54,6 +55,9 @@ public class ProxyApi {
         EndpointRegistrator endpoints = new EndpointRegistrator(logger,this,server);
         endpoints.disable();
         endpoints.enable();
+        Config.passwords.clear();
+        Auth.getPasswords().thenAccept(passwords->Config.passwords = passwords);
+        System.out.println(Config.proxyServer);
 
     }
 }

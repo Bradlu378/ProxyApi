@@ -3,12 +3,16 @@ package foxo.flanty.proxyApi.handlers;
 import foxo.flanty.proxyApi.ProxyApi;
 import foxo.flanty.proxyApi.REST.requests.Auth;
 import foxo.flanty.proxyApi.settings.Config;
+import foxo.flanty.proxyApi.utils.message.ComponentUtils;
 import foxo.flanty.proxyApi.utils.message.Style;
 import net.elytrium.limboapi.api.Limbo;
 import net.elytrium.limboapi.api.LimboSessionHandler;
 import net.elytrium.limboapi.api.player.LimboPlayer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.TitlePart;
@@ -22,6 +26,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static foxo.flanty.proxyApi.settings.Config.proxy;
 import static foxo.flanty.proxyApi.settings.Language.*;
 
 public class LoginHandler implements LimboSessionHandler {
@@ -41,7 +46,7 @@ public class LoginHandler implements LimboSessionHandler {
         this.player = player;
         player.disableFalling();
         authStage = Config.passwords.containsKey((player.getProxyPlayer().getUsername()));
-        if (!authStage) login();
+        if (authStage) login();
         else register();
 
 
@@ -63,7 +68,11 @@ public class LoginHandler implements LimboSessionHandler {
             }
 
         }, 0, 500, TimeUnit.MILLISECONDS);
-        Auth.register(player.getProxyPlayer().getUsername());
+        Auth.register(player.getProxyPlayer().getUsername()).thenAccept(url->
+            player.getProxyPlayer().sendMessage(Component
+                    .text("Зарегистрируйтесь по ссылке\n", NamedTextColor.DARK_AQUA)
+                    .append(Component.text(url, NamedTextColor.WHITE, TextDecoration.ITALIC)
+                            .clickEvent(ClickEvent.openUrl(url)))));
     }
     private void login() {
         player.getProxyPlayer().sendMessage(Style.SCHALKER_1.style("Добро пожаловать на ").append(Style.GOLD.style(serverName)));
@@ -72,19 +81,23 @@ public class LoginHandler implements LimboSessionHandler {
 
     @Override
     public void onChat(String message) {
+        if (message.startsWith("/")){
+            message = message.substring(1);
+        } else return;
         String[] args = message.split(" ");
         switch (args[0]) {
             case "login":
                 if(args.length == 2) {
-                    if (BCrypt.hashpw(args[1], BCrypt.gensalt()).equals(Config.passwords.get(player.getProxyPlayer().getUsername()))) {
-                        player.getProxyPlayer().disconnect(Component.empty());
-                    }
+                    if (BCrypt.checkpw(args[1], Config.passwords.get(player.getProxyPlayer().getUsername()))) {
+                       player.disconnect();
+                    } else player.getProxyPlayer().sendMessage(Style.RED.style("Неверный пароль"));
                 }
                 break;
         }
     }
     @Override
     public void onDisconnect() {
+        //Config.proxyServer.getAllServers().stream().findFirst().ifPresent(server -> player.getProxyPlayer().createConnectionRequest(server).connect());
     }
 
     private void schedulerStop() {

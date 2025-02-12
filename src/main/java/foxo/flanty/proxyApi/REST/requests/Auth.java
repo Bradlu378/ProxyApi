@@ -65,7 +65,7 @@ public class Auth {
                 if (response.isSuccessful() && response.body() != null) {
                     String responseBody = response.body().string();
                     JSONObject json = new JSONObject(responseBody);
-                    String url = json.getString("url");
+                    String url = json.getString("login_url");//todo авик уточнить
 
                     future.complete(url);
                 } else {
