@@ -5,7 +5,6 @@ import foxo.flanty.proxyApi.ProxyApi;
 import foxo.flanty.proxyApi.handlers.LoginHandler;
 import net.elytrium.limboapi.api.Limbo;
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
-import org.mindrot.bcrypt.BCrypt;
 import org.slf4j.Logger;
 
 public class Auth {

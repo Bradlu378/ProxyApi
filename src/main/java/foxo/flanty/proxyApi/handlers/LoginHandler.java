@@ -73,6 +73,7 @@ public class LoginHandler implements LimboSessionHandler {
                     .text("Зарегистрируйтесь по ссылке\n", NamedTextColor.DARK_AQUA)
                     .append(Component.text(url, NamedTextColor.WHITE, TextDecoration.ITALIC)
                             .clickEvent(ClickEvent.openUrl(url)))));
+
     }
     private void login() {
         player.getProxyPlayer().sendMessage(Style.SCHALKER_1.style("Добро пожаловать на ").append(Style.GOLD.style(serverName)));
