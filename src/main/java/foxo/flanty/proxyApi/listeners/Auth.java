@@ -2,7 +2,7 @@ package foxo.flanty.proxyApi.listeners;
 
 import com.velocitypowered.api.event.Subscribe;
 import foxo.flanty.proxyApi.ProxyApi;
-import foxo.flanty.proxyApi.handlers.LoginHandler;
+import foxo.flanty.proxyApi.handlers.AuthHandler;
 import net.elytrium.limboapi.api.Limbo;
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ public class Auth {
     }
     @Subscribe(priority = 32767)
     public void onLogin(LoginLimboRegisterEvent event) {
-        event.addOnJoinCallback(() -> limbo.spawnPlayer(event.getPlayer(), new LoginHandler(proxy,logger)));
+        event.addOnJoinCallback(() -> limbo.spawnPlayer(event.getPlayer(), new AuthHandler(proxy,logger)));
         //event.addCallback(() -> this.virtualServer.spawnPlayer(event.getPlayer(), new Handler()));
     }
 }

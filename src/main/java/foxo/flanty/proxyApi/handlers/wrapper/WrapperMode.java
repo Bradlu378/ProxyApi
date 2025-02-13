@@ -1,4 +1,4 @@
-package foxo.flanty.proxyApi.utils.limboWrapper;
+package foxo.flanty.proxyApi.handlers.wrapper;
 
 public enum WrapperMode {
     COMMAND,
