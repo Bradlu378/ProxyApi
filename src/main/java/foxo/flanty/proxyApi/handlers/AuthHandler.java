@@ -9,6 +9,7 @@ import foxo.flanty.proxyApi.settings.Config;
 import foxo.flanty.proxyApi.utils.message.Style;
 import net.elytrium.limboapi.api.Limbo;
 import net.elytrium.limboapi.api.player.LimboPlayer;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,6 +19,7 @@ import org.mindrot.bcrypt.BCrypt;
 import org.slf4j.Logger;
 
 import java.time.Duration;
+import java.util.Stack;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,8 +33,8 @@ public class AuthHandler extends LimboWrapper {
     private Player player;
     private final Logger logger;
     boolean authStage;
-    //BossBar bossBar = BossBar.bossBar();
-    ScheduledFuture<?> mainExecutor;
+    BossBar bossBar = BossBar.bossBar(Style.GOLD.style("Время авторизации"),1, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS);
+    Stack<ScheduledFuture<?>> mainExecutor;
     public AuthHandler(ProxyApi plugin, Logger logger) {
         super(WrapperMode.FULL);
         this.plugin = plugin;
@@ -56,17 +58,28 @@ public class AuthHandler extends LimboWrapper {
         //scheduledTasks.add(task1);
 
     }
+    private void bossBarTime(long time) {
+        float[] progress = {0};
+        mainExecutor.add(limboPlayer.getScheduledExecutor().schedule(() -> {
+          player.showBossBar(bossBar);
+          progress[0] += (float) 1 /time;
+          bossBar.progress(progress[0]);
+
+        }, time, TimeUnit.SECONDS));
+    }
+
     private void register() {
         AtomicInteger step = new AtomicInteger(0);
-        mainExecutor = limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
+        mainExecutor.add(limboPlayer.getScheduledExecutor().schedule(() -> {
             switch (step.getAndIncrement() % 4) {
                 case 0 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle1), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
                 case 1 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle2), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
                 case 2 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle3), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
                 case 3 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle4), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
             }
+            bossBarTime(90);
 
-        }, 0, 500, TimeUnit.MILLISECONDS);
+        }, 500, TimeUnit.MILLISECONDS));
         Auth.register(limboPlayer.getProxyPlayer().getUsername()).thenAccept(url->
             limboPlayer.getProxyPlayer().sendMessage(Component
                     .text("Зарегистрируйтесь по ссылке\n", NamedTextColor.DARK_AQUA)
@@ -103,7 +116,9 @@ public class AuthHandler extends LimboWrapper {
 
     @Override
     public void handleDisconnect() {
-        mainExecutor.cancel(true);
+        for (ScheduledFuture<?> future : mainExecutor) {
+            future.cancel(true);
+        }
         //Config.proxyServer.getAllServers().stream().findFirst().ifPresent(server -> player.getProxyPlayer().createConnectionRequest(server).connect());
     }
 }
