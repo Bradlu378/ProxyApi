@@ -18,6 +18,7 @@ import net.kyori.adventure.title.Title;
 import org.mindrot.bcrypt.BCrypt;
 import org.slf4j.Logger;
 
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.Stack;
 import java.util.concurrent.ScheduledFuture;
@@ -33,8 +34,10 @@ public class AuthHandler extends LimboWrapper {
     private Player player;
     private final Logger logger;
     boolean authStage;
-    BossBar bossBar = BossBar.bossBar(Style.GOLD.style("Время авторизации"),1, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS);
-    Stack<ScheduledFuture<?>> mainExecutor;
+    long joinTime;
+    long lastCommandTime = 0;
+    BossBar bossBar = BossBar.bossBar(Style.GOLD.style("Время авторизации"),1.0f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
+    Stack<ScheduledFuture<?>> mainExecutor = new Stack<>();
     public AuthHandler(ProxyApi plugin, Logger logger) {
         super(WrapperMode.FULL);
         this.plugin = plugin;
@@ -43,6 +46,7 @@ public class AuthHandler extends LimboWrapper {
 
     @Override
     public void handleSpawn(Limbo server, LimboPlayer limboPlayer, Player player, Logger logger) {
+        joinTime = System.currentTimeMillis();
         this.limboPlayer = limboPlayer;
         this.player = player;
         limboPlayer.disableFalling();
@@ -59,34 +63,36 @@ public class AuthHandler extends LimboWrapper {
 
     }
     private void bossBarTime(long time) {
-        float[] progress = {0};
-        mainExecutor.add(limboPlayer.getScheduledExecutor().schedule(() -> {
-          player.showBossBar(bossBar);
-          progress[0] += (float) 1 /time;
-          bossBar.progress(progress[0]);
-
-        }, time, TimeUnit.SECONDS));
+        player.showBossBar(bossBar);
+        mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleWithFixedDelay(() -> {
+            if (System.currentTimeMillis() - joinTime > time*1000) {
+                player.disconnect(Component.text("Время ожидания вышло"));
+            } else {
+                    this.bossBar.name(Component.text("Время авторизации"));
+                    this.bossBar.progress(Math.min(1.0F, bossBar.progress()-((float) 1 /time)));
+            }
+        }, 0, 1, TimeUnit.SECONDS));
     }
 
     private void register() {
         AtomicInteger step = new AtomicInteger(0);
-        mainExecutor.add(limboPlayer.getScheduledExecutor().schedule(() -> {
+       mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
             switch (step.getAndIncrement() % 4) {
                 case 0 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle1), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
                 case 1 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle2), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
                 case 2 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle3), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
                 case 3 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle4), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
             }
-            bossBarTime(90);
-
-        }, 500, TimeUnit.MILLISECONDS));
+        }, 1000,700, TimeUnit.MILLISECONDS));
+        bossBarTime(90);
         Auth.register(limboPlayer.getProxyPlayer().getUsername()).thenAccept(url->
             limboPlayer.getProxyPlayer().sendMessage(Component
                     .text("Зарегистрируйтесь по ссылке\n", NamedTextColor.DARK_AQUA)
-                    .append(Component.text(url, NamedTextColor.WHITE, TextDecoration.ITALIC)
-                            .clickEvent(ClickEvent.openUrl(url)))));
-
+                    .append(Component
+                            .text(url, NamedTextColor.WHITE, TextDecoration.ITALIC)
+                            .clickEvent(ClickEvent.openUrl(url)).decorate(TextDecoration.UNDERLINED))));
     }
+
     private void login() {
         limboPlayer.getProxyPlayer().sendMessage(Style.SCHALKER_1.style("Добро пожаловать на ").append(Style.GOLD.style(serverName)));
         limboPlayer.getProxyPlayer().sendMessage(Style.DARK_AQUA.style("Авторизуйтесь с ").append(Style.WHITE.style("/login <пароль>")));
@@ -95,6 +101,10 @@ public class AuthHandler extends LimboWrapper {
     @Override
     public void handleChat(String message, String[] args, boolean isCommand) {
         if (!isCommand) return;
+        if ((System.currentTimeMillis()-lastCommandTime) >= 1500) {
+            player.sendMessage(Style.RED.style("Подождите перед следующим вводом!"));
+            return;
+        }
         switch (args[0]) {
             case "login":
                 if(args.length == 2) {
@@ -104,6 +114,7 @@ public class AuthHandler extends LimboWrapper {
                 }
                 break;
         }
+        lastCommandTime = System.currentTimeMillis();
     }
 
     @Override
