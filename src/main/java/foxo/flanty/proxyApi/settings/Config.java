@@ -14,4 +14,6 @@ public class Config {
     public static Logger logger;
     public static Map<String,String> passwords = new HashMap<>();
     public static Map<String,String> lastIps = new HashMap<>();
+    public static int authTime = 45;
+    public static boolean bossBar = true;
 }

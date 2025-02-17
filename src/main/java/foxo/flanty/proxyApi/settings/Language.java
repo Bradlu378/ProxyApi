@@ -9,4 +9,7 @@ public class Language {
     public static String registrationTitle4 = "Регистрация...";
     public static String serverName = "Lactern";
     public static String loginMessage = "Авторизуйтесь с /login <пароль>";
+    public static String bossBarName = "⌚";
+    public static String loginAttemptsOut = "Превышен лимит попыток входа";
+    public static String commandDelay = "Подождите перед следующим вводом!";
 }
