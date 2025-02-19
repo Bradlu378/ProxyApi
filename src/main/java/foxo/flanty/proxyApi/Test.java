@@ -1,12 +1,5 @@
 package foxo.flanty.proxyApi;
 
-import foxo.flanty.proxyApi.utils.AuthUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import static foxo.flanty.proxyApi.utils.AuthUtils.convertMillisToDate;
-
 public class Test {
 
     private static String bytesToHex(byte[] bytes) {
@@ -16,7 +9,11 @@ public class Test {
         }
         return sb.toString();
     }
+
     public static void main(String[] args) {
         System.out.println(bytesToHex(AuthUtils.generateChallengeBytes()));
+        register("922540e1-4cf2-4427-ba1b-fc9975ef4d4d");
     }
+
+
 }

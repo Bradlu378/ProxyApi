@@ -11,8 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-import static foxo.flanty.proxyApi.settings.Endpoints.playerPasswordsHashes;
-import static foxo.flanty.proxyApi.settings.Endpoints.playerRegister;
+import static foxo.flanty.proxyApi.settings.Endpoints.*;
 import static foxo.flanty.proxyApi.settings.Language.apiResponseError;
 
 public class Auth {
@@ -71,6 +70,35 @@ public class Auth {
                 } else {
                     future.complete(null);
                     throw new IOException(apiResponseError + response.code());
+                }
+            }
+        });
+        return future;
+    }
+    public static CompletableFuture<Boolean> isLicense(String uuid) {
+        OkHttpClient client = new OkHttpClient();
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        Request request = new Request.Builder().url(MojangAPI + uuid).get().build();
+        /*
+        200 OK
+        204 no profile
+        404 no profile
+        429 rate limit, console spam + webhook?
+        500 пизда крч
+        */
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Config.logger.error("500",this);
+                Config.logger.error(e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.isSuccessful()) future.complete(true);
+                else {
+                    Config.logger.error("Mojang api error: " + response.code());
+                    future.complete(false);
                 }
             }
         });
