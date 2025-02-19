@@ -12,10 +12,7 @@ import foxo.flanty.proxyApi.REST.endpoints.EndpointRegistrator;
 import foxo.flanty.proxyApi.REST.requests.Auth;
 import foxo.flanty.proxyApi.listeners.EventRegistrator;
 import foxo.flanty.proxyApi.settings.Config;
-import net.elytrium.limboapi.api.Limbo;
 import net.elytrium.limboapi.api.LimboFactory;
-import net.elytrium.limboapi.api.chunk.Dimension;
-import net.elytrium.limboapi.api.chunk.VirtualWorld;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -36,16 +33,14 @@ public class ProxyApi {
                 .getPlugin("limboapi")
                 .flatMap(PluginContainer::getInstance)
                 .orElseThrow(() -> new IllegalStateException("LimboAPI не найден!"));
-
-        this.logger.info("ProxyApi загружен!");
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         EventRegistrator events = new EventRegistrator(logger,this,server,limboFactory);
         events.register();
-
         reload();
+
     }
 
     public void reload() {
@@ -57,7 +52,5 @@ public class ProxyApi {
         endpoints.enable();
         Config.passwords.clear();
         Auth.getPasswords().thenAccept(passwords->Config.passwords = passwords);
-        System.out.println(Config.proxyServer);
-
     }
 }

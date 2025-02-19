@@ -48,7 +48,7 @@ shadowJar {
     dependencies {
         exclude(dependency("org.slf4j:slf4j-api"))
     }
-    getArchiveClassifier().set("")
+    getArchiveClassifier().set("")//same jar name for shadow
 }
 
 def targetJavaVersion = 21
