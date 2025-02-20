@@ -11,42 +11,48 @@ import net.elytrium.limboapi.api.Limbo;
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
 import org.slf4j.Logger;
 
-import java.util.Optional;
-
-
 public class Auth {
     private final Limbo limbo;
     private final ProxyApi proxy;
     private final Logger logger;
+
     public Auth(ProxyApi proxy, Limbo limbo, Logger logger) {
         this.proxy = proxy;
         this.limbo = limbo;
         this.logger = logger;
     }
+
     @Subscribe(priority = 32767)
     public void onLogin(LoginLimboRegisterEvent event) {
-        event.addOnJoinCallback(() -> limbo.spawnPlayer(event.getPlayer(), new AuthHandler(proxy,logger)));
+        event.addOnJoinCallback(() -> limbo.spawnPlayer(event.getPlayer(), new AuthHandler(proxy, logger)));
     }
 
-    @Subscribe(order = PostOrder.LATE)
+    @Subscribe(priority = 32767)
     public void onPreLoginEvent(PreLoginEvent event) {
-        System.out.println(event.getUniqueId());
+        String uuid = event.getUniqueId().toString();
+        String username = event.getUsername();
+        AuthPlayer authPlayer = Config.authPlayers.get(username);
+        boolean sameUUID = foxo.flanty.proxyApi.REST.requests.Auth.isLicense(uuid).join();
 
-        foxo.flanty.proxyApi.REST.requests.Auth.isLicense(event.getUsername()).thenAccept(auth -> {
-                    String UUID;
-                    if (auth) UUID = event.getUsername();
-                    else UUID = null;
-                    if (Config.authPlayers.get(event.getUsername())==null) {
-                        foxo.flanty.proxyApi.REST.requests.Auth.isLicense(event.getUsername());
-                        AuthPlayer authPlayer = new AuthPlayer(
-                                event.getConnection().getRemoteAddress().toString()
-                                ,System.currentTimeMillis()
-                                ,UUID);
-                        Config.authPlayers.put(event.getUsername(), authPlayer);
-        });
-
-
+        if (authPlayer != null) {
+            if (System.currentTimeMillis() - authPlayer.licenseTimestamp > 43200000L | authPlayer.licensedUUID == null) {//обновление uuid если старше 12ч
+                    if (sameUUID) {
+                        authPlayer.licenseTimestamp = System.currentTimeMillis();
+                        authPlayer.licensedUUID = uuid;
+                        event.setResult(PreLoginEvent.PreLoginComponentResult.forceOnlineMode());
+                    }
+            } else if (uuid.equals(authPlayer.licensedUUID))
+                event.setResult(PreLoginEvent.PreLoginComponentResult.forceOnlineMode());
+        } else {
+                Config.authPlayers.put(
+                        username,
+                        new AuthPlayer(event.getConnection().getRemoteAddress().toString(),
+                                0L,
+                                sameUUID ? uuid : null,
+                                System.currentTimeMillis()));
+                if (sameUUID){
+                    event.setResult(PreLoginEvent.PreLoginComponentResult.forceOnlineMode());
+                }
         }
-        event.setResult(PreLoginEvent.PreLoginComponentResult.forceOfflineMode());
     }
 }

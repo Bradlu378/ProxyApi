@@ -82,6 +82,7 @@ public class Auth {
         /*
         200 OK
         204 no profile
+        400 wrong uuid?
         404 no profile
         429 rate limit, console spam + webhook?
         500 пизда крч

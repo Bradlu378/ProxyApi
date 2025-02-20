@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 
 import java.text.MessageFormat;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -75,18 +76,23 @@ public class AuthHandler extends LimboWrapper {
             }
         }, 0, 1, TimeUnit.SECONDS));
     }
+    private void registrationTitle() {
+        AtomicInteger step = new AtomicInteger(0);
+        String[] titles = {registrationTitle1, registrationTitle2, registrationTitle3, registrationTitle4};
+
+        mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
+            limboPlayer.getProxyPlayer().showTitle(
+                    Title.title(
+                            Component.text(titles[step.getAndIncrement() % 4]),
+                            Component.empty(),
+                            Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO))
+            );
+        }, 1000, 700, TimeUnit.MILLISECONDS));
+    }
 
     private void register() {
         //Title регистрации на экране
-        AtomicInteger step = new AtomicInteger(0);
-       mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
-            switch (step.getAndIncrement() % 4) {
-                case 0 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle1), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
-                case 1 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle2), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
-                case 2 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle3), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
-                case 3 -> limboPlayer.getProxyPlayer().showTitle(Title.title(Component.text(registrationTitle4), Component.empty(), Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)));
-            }
-        }, 1000,700, TimeUnit.MILLISECONDS));
+        registrationTitle();
         //получение ссылки авторизации от rest api бота
         Auth.register(limboPlayer.getProxyPlayer().getUsername()).thenAccept(url->
             limboPlayer.getProxyPlayer().sendMessage(Component
@@ -97,6 +103,9 @@ public class AuthHandler extends LimboWrapper {
     }
 
     private void login() {
+        if (Objects.equals(Config.authPlayers.get(player.getUsername()).licensedUUID, player.getUniqueId().toString())) {
+            limboPlayer.disconnect();
+        }
         limboPlayer.getProxyPlayer().sendMessage(Style.SCHALKER_1.style("Добро пожаловать на ").append(Style.GOLD.style(serverName)));
         limboPlayer.getProxyPlayer().sendMessage(Style.DARK_AQUA.style("Авторизуйтесь с ").append(Style.WHITE.style("/login <пароль>")));
     }

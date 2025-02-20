@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 
+import static foxo.flanty.proxyApi.settings.Endpoints.playerJoin;
+
 public class Player {
     private final Limbo limbo;
     private ProxyApi proxy;
@@ -29,12 +31,12 @@ public class Player {
 
         OkHttpClient client = new OkHttpClient();
         RequestBody body = RequestBody.create(json, MediaType.get("application/json; charset=utf-8"));
-        Request request = new Request.Builder().url("http://localhost:7001/bot/player-join").put(body).build();
+        Request request = new Request.Builder().url(playerJoin).put(body).build();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Config.logger.error("Failed to send player join event: " + e.getMessage(), e);
+                Config.logger.error("Failed to send join event: " + e.getMessage(), e);
             }
 
             @Override
@@ -42,7 +44,7 @@ public class Player {
                 if (response.isSuccessful()) {
                     Config.logger.info("Player join event sent successfully");
                 } else {
-                    Config.logger.info("Failed to send player join event: " + response.code());
+                    Config.logger.info("Failed to send join event: " + response.code());
                 }
             }
         });

@@ -10,7 +10,6 @@ import net.elytrium.limboapi.api.chunk.VirtualWorld;
 import net.skinsrestorer.api.SkinsRestorerProvider;
 import net.skinsrestorer.api.event.SkinApplyEvent;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class EventRegistrator {
     Logger logger;
