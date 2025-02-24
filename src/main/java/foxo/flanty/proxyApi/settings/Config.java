@@ -17,8 +17,10 @@ public class Config {
     public static Map<String, AuthPlayer> authPlayers = new HashMap<>();
     public static Stack<String> registeredPlayers = new Stack<>();
     public static int authTime = 45;
+    public static int registerTime = 90;
     public static boolean bossBar = true;
     public static boolean discordLoggingEnabled = true;
+    public static int loginAttempts = 3;
 
 
 }

@@ -56,24 +56,15 @@ public class AuthHandler extends LimboWrapper {
         authStage = Config.passwords.containsKey((player.getUsername()));
         if (authStage) login();
         else register();
-        authTime(Config.authTime);
-
-
-        //ScheduledFuture<?> task1 = player.getScheduledExecutor().schedule(()->{
-        //    logger.info("test");
-        //    //player.getProxyPlayer().sendMessage(Component.text("da"));
-        //},20,TimeUnit.SECONDS);
-        //scheduledTasks.add(task1);
     }
 
     private void authTime(long time) {
-        if (Config.bossBar) player.showBossBar(bossBar);
+        if (Config.bossBar) player.showBossBar(bossBar);//bossbar
         mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleWithFixedDelay(() -> {
-            if (System.currentTimeMillis() - joinTime > time*1000) {
+            if (System.currentTimeMillis() - joinTime > time*1000)
                 player.disconnect(Style.RED.style(loginTimeOut));
-            } else {
-                    bossBar.progress(Math.min(1.0f, bossBar.progress()-((float) 1 /time)));
-            }
+            else
+                bossBar.progress(Math.min(1.0f, bossBar.progress()-((float) 1 /time)));
         }, 0, 1, TimeUnit.SECONDS));
     }
     private void registrationTitle() {
@@ -91,21 +82,27 @@ public class AuthHandler extends LimboWrapper {
     }
 
     private void register() {
+        authTime(Config.registerTime);
         //Title регистрации на экране
         registrationTitle();
         //получение ссылки авторизации от rest api бота
         Auth.register(limboPlayer.getProxyPlayer().getUsername(), String.valueOf(player.getUniqueId())).thenAccept(url->
             limboPlayer.getProxyPlayer().sendMessage(Component
-                    .text("Зарегистрируйтесь по ссылке\n", NamedTextColor.DARK_AQUA)
+                    .text("Для регистрации перейдите по ссылке:\n", NamedTextColor.DARK_AQUA)
                     .append(Component
                             .text(url, NamedTextColor.WHITE, TextDecoration.ITALIC)
                             .clickEvent(ClickEvent.openUrl(url)).decorate(TextDecoration.UNDERLINED))));
         mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
-            Config.registeredPlayers.contains(player.getUsername());
-        }, 1, 2, TimeUnit.SECONDS));
+            if (Config.registeredPlayers.contains(player.getUsername())) {
+                Config.registeredPlayers.remove(player.getUsername());
+                stopSchedulers();
+                login();
+            }
+        }, 1, 3, TimeUnit.SECONDS));
     }
 
     private void login() {
+        authTime(Config.authTime);
         AuthPlayer authPlayer = Config.authPlayers.get(player.getUsername());
         if (Objects.equals(authPlayer.licensedUUID, player.getUniqueId().toString())) {
             limboPlayer.disconnect();//есть гарантия что челы с тем uuid полюбас пойдут по онлайну. Наверное......
@@ -120,25 +117,24 @@ public class AuthHandler extends LimboWrapper {
     @Override
     public void handleChat(String message, String[] args, boolean isCommand) {
         if (!isCommand) return;
-        if(loginAttempts>3) player.disconnect(Style.RED.style(loginAttemptsOut));
+        if(loginAttempts>Config.loginAttempts) player.disconnect(Style.RED.style(loginAttemptsOut));
         if ((System.currentTimeMillis()-lastCommandTime) <= 1500) {
             player.sendMessage(Style.RED.style(commandDelay));
             return;
         }
-        switch (args[0]) {
-            case "login":
-                if(args.length == 2) {
-                    if (BCrypt.checkpw(args[1], Config.passwords.get(limboPlayer.getProxyPlayer().getUsername()))) {
-                       limboPlayer.disconnect();
-                       AuthPlayer authPlayer = Config.authPlayers.get(player.getUsername());
-                       authPlayer.ip = String.valueOf(player.getRemoteAddress().getAddress());
-                       authPlayer.timestamp = System.currentTimeMillis();
-                    } else {
-                        limboPlayer.getProxyPlayer().sendMessage(Style.RED.style("Неверный пароль"));
-                        ++loginAttempts;
-                    }
-                }
-                break;
+        if((Objects.equals(args[0], "login") || args[0].equals("log")) && args.length == 2) {
+            if (BCrypt.checkpw(args[1], Config.passwords.get(limboPlayer.getProxyPlayer().getUsername()))) {
+                limboPlayer.disconnect();
+                AuthPlayer authPlayer = Config.authPlayers.get(player.getUsername());
+                authPlayer.ip = String.valueOf(player.getRemoteAddress().getAddress());
+                authPlayer.timestamp = System.currentTimeMillis();
+            } else {
+                limboPlayer.getProxyPlayer().sendMessage(Style.RED.style("Неверный пароль"));
+                ++loginAttempts;
+            }
+        } else {
+            player.sendMessage(Style.RED.style("Неверная команда, пример:"));
+            player.sendMessage(Style.WHITE.style("/login <пароль>"));
         }
         lastCommandTime = System.currentTimeMillis();
     }
@@ -151,10 +147,14 @@ public class AuthHandler extends LimboWrapper {
     public void handleGeneric(Object packet) {
     }
 
-    @Override
-    public void handleDisconnect() {
+    private void stopSchedulers() {
         for (ScheduledFuture<?> future : mainExecutor) {
             future.cancel(true);
         }
+    }
+
+    @Override
+    public void handleDisconnect() {
+        stopSchedulers();
     }
 }
