@@ -1,12 +1,9 @@
 package foxo.flanty.proxyApi.REST.requests;
 
-import com.velocitypowered.api.proxy.Player;
 import foxo.flanty.proxyApi.settings.Config;
-import foxo.flanty.proxyApi.utils.SRUtils;
-import net.skinsrestorer.api.property.SkinProperty;
 import okhttp3.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -24,34 +21,36 @@ public class Auth {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                future.completeExceptionally(e);
+                e.printStackTrace();
+                future.complete(new HashMap<>());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful() && response.body() != null) {
-                    String responseBody = response.body().string();
-                    JSONObject json = new JSONObject(responseBody);
-                    JSONObject playersJson = json.getJSONObject("players");
-
-                    HashMap<String, String> players = new HashMap<>();
-                    for (String key : playersJson.keySet()) {
-                        players.put(key, playersJson.getString(key));
-                    }
-
-                    future.complete(players);
-                } else {
-                    future.completeExceptionally(new IOException("HTTP error: " + response.code()));
+                if (!response.isSuccessful() && response.body() == null) {
+                    future.completeExceptionally(new IOException("ГАВНО РЕСПОНС, ХУЙНЯ ДАВАЙ ПО НОВОЙ: " + response.code()));
+                    future.complete(new HashMap<>());
                 }
+                    JSONObject json = new JSONObject(response.body().string());
+                    JSONArray players = json.optJSONArray("players");
+
+                    HashMap<String, String> playersMap = new HashMap<>();
+                    for (int i = 0; i < players.length(); i++) {
+                        JSONObject player = players.getJSONObject(i);
+                        playersMap.put(
+                                player.optString("username", null),
+                                player.optString("password_hash", null));
+                    }
+                    future.complete(playersMap);
             }
         });
         return future;
     }
-    public static CompletableFuture<String> register(String nickname) {
+    public static CompletableFuture<String> register(String nickname, String uuid) {
         OkHttpClient client = new OkHttpClient();
         CompletableFuture<String> future = new CompletableFuture<>();
 
-        Request request = new Request.Builder().url(playerRegister + "?username=" + nickname).get().build();
+        Request request = new Request.Builder().url(playerRegister + "?username=" + nickname + "&uuid=" + uuid).get().build();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -64,7 +63,7 @@ public class Auth {
                 if (response.isSuccessful() && response.body() != null) {
                     String responseBody = response.body().string();
                     JSONObject json = new JSONObject(responseBody);
-                    String url = json.getString("login_url");//todo авик уточнить
+                    String url = json.getString("url");
 
                     future.complete(url);
                 } else {

@@ -2,7 +2,6 @@ package foxo.flanty.proxyApi;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
-import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Dependency;
@@ -15,7 +14,6 @@ import foxo.flanty.proxyApi.REST.requests.Auth;
 import foxo.flanty.proxyApi.commands.Reload;
 import foxo.flanty.proxyApi.listeners.EventRegistrator;
 import foxo.flanty.proxyApi.settings.Config;
-import io.javalin.plugin.bundled.BasicAuthPlugin;
 import net.elytrium.limboapi.api.LimboFactory;
 import org.slf4j.Logger;
 
@@ -32,7 +30,6 @@ public class ProxyApi {
         this.logger = logger;
         this.server = server;
 
-        // Инициализация limboFactory внутри конструктора
         this.limboFactory = (LimboFactory) this.server.getPluginManager()
                 .getPlugin("limboapi")
                 .flatMap(PluginContainer::getInstance)

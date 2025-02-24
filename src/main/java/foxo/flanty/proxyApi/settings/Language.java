@@ -12,4 +12,5 @@ public class Language {
     public static String bossBarName = "⌚";
     public static String loginAttemptsOut = "Превышен лимит попыток входа";
     public static String commandDelay = "Подождите перед следующим вводом!";
+    public static String loginTimeOut = "Время ожидания вышло";
 }

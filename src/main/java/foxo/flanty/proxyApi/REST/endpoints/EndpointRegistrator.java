@@ -22,10 +22,9 @@ public class EndpointRegistrator {
             logger.warn("API is already running!");
             return;
         }
-        app = Javalin.create().start(7000);
+        app = Javalin.create().start("0.0.0.0", 7000);
         app.post("/proxy/set-skin", Skins::setSkin);
         app.put("/proxy/auth/password", Auth::setPass);
-
     }
     public void disable() {
         if (app != null) {

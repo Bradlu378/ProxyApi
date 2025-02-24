@@ -28,7 +28,7 @@ public class EventRegistrator {
 
     public void register() {
         eventManager = server.getEventManager();
-        VirtualWorld world = factory.createVirtualWorld(Dimension.THE_END, 14, 100, 88, 90F, 0F);
+        VirtualWorld world = factory.createVirtualWorld(Dimension.THE_END, 14, 100, 88, 90F, 0F);//пасхалко
         limbo = factory.createLimbo(world);
 
         eventManager.register(proxyApi, new Auth(proxyApi,limbo,logger));
