@@ -11,11 +11,7 @@ import java.util.Stack;
 import java.util.concurrent.ScheduledFuture;
 
 public abstract class LimboWrapper implements LimboSessionHandler {
-    protected final WrapperMode mode;
 
-    public LimboWrapper(WrapperMode mode) {
-        this.mode = mode;
-    }
     boolean disconnectReason = false;
     Player player;
     Stack<ScheduledFuture<?>> tasks = new Stack<>();

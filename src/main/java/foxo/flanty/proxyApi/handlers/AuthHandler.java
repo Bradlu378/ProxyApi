@@ -4,9 +4,7 @@ import com.velocitypowered.api.proxy.Player;
 import foxo.flanty.proxyApi.ProxyApi;
 import foxo.flanty.proxyApi.REST.requests.Auth;
 import foxo.flanty.proxyApi.handlers.wrapper.LimboWrapper;
-import foxo.flanty.proxyApi.handlers.wrapper.WrapperMode;
 import foxo.flanty.proxyApi.settings.Config;
-import foxo.flanty.proxyApi.settings.Language;
 import foxo.flanty.proxyApi.utils.AuthPlayer;
 import foxo.flanty.proxyApi.utils.message.Style;
 import net.elytrium.limboapi.api.Limbo;
@@ -33,15 +31,13 @@ import static foxo.flanty.proxyApi.settings.Language.*;
 public class AuthHandler extends LimboWrapper {
     private LimboPlayer limboPlayer;
     private Player player;
-    boolean authStage;
     byte loginAttempts = 0;
-    long joinTime;
     long lastCommandTime = 0;
     MiniMessage miniMessage;
     BossBar bossBar = BossBar.bossBar(Style.GOLD.style(bossBarName), 1.0f, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
     Stack<ScheduledFuture<?>> mainExecutor = new Stack<>();
     public AuthHandler(ProxyApi plugin, Logger logger) {//логер и плагин шото здесь нахуй не сдались, ну и ладно
-        super(WrapperMode.FULL);
+
     }
 
     @Override
@@ -50,7 +46,7 @@ public class AuthHandler extends LimboWrapper {
         this.player = player;
         limboPlayer.disableFalling();
         miniMessage = MiniMessage.miniMessage();
-        authStage = Config.passwords.containsKey((player.getUsername()));
+        boolean authStage = Config.passwords.containsKey((player.getUsername()));
         if (authStage) login();
         else register();
     }
@@ -65,6 +61,7 @@ public class AuthHandler extends LimboWrapper {
                 bossBar.progress(Math.min(1.0f, bossBar.progress()-((float) 1 /time)));
         }, 0, 1, TimeUnit.SECONDS));
     }
+
     private void registrationTitle() {
         AtomicInteger step = new AtomicInteger(0);
         String[] titles = {registrationTitle1, registrationTitle2, registrationTitle3, registrationTitle4};
@@ -86,11 +83,8 @@ public class AuthHandler extends LimboWrapper {
         Auth.register(limboPlayer.getProxyPlayer().getUsername(), String.valueOf(player.getUniqueId())).thenAccept(url->
 
                player.sendMessage(miniMessage
-                       .deserialize(registerMessage)
-                       .appendNewline()
-                       .append(Component
-                               .text("https://discord.com/api/oauth", NamedTextColor.AQUA, TextDecoration.ITALIC)
-                               .clickEvent(ClickEvent.openUrl(url)))));
+                       .deserialize(registerMessage).append(miniMessage.deserialize(urlPlaceholder)).clickEvent(ClickEvent.openUrl(url))));
+
 
         mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {//ждемс пока чел зарегается
             if (Config.registeredPlayers.contains(player.getUsername())) {//при прохождении регистрации
@@ -108,6 +102,7 @@ public class AuthHandler extends LimboWrapper {
         if (Objects.equals(authPlayer.licensedUUID, player.getUniqueId().toString())) {
             limboPlayer.disconnect();//челы с fake uuid пойдут по онлайну. Наверное... не проверял :З
             authPlayer.timestamp = System.currentTimeMillis();
+            authPlayer.ip = player.getRemoteAddress().getAddress().toString();
             return;
         } else if (authPlayer.ip.equals(player.getRemoteAddress().getAddress().toString()) && (System.currentTimeMillis() - authPlayer.timestamp) < Config.loginSessionTime) {
             limboPlayer.disconnect();
