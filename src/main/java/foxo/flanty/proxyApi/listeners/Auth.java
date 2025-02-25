@@ -1,5 +1,6 @@
 package foxo.flanty.proxyApi.listeners;
 
+import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
@@ -8,8 +9,11 @@ import foxo.flanty.proxyApi.handlers.AuthHandler;
 import foxo.flanty.proxyApi.settings.Config;
 import foxo.flanty.proxyApi.utils.AuthPlayer;
 import net.elytrium.limboapi.api.Limbo;
+import net.elytrium.limboapi.api.command.LimboCommandMeta;
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
 import org.slf4j.Logger;
+
+import java.util.List;
 
 public class Auth {
     private final Limbo limbo;

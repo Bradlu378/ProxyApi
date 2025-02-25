@@ -6,6 +6,7 @@ import foxo.flanty.proxyApi.REST.requests.Auth;
 import foxo.flanty.proxyApi.handlers.wrapper.LimboWrapper;
 import foxo.flanty.proxyApi.handlers.wrapper.WrapperMode;
 import foxo.flanty.proxyApi.settings.Config;
+import foxo.flanty.proxyApi.settings.Language;
 import foxo.flanty.proxyApi.utils.AuthPlayer;
 import foxo.flanty.proxyApi.utils.message.Style;
 import net.elytrium.limboapi.api.Limbo;
@@ -15,11 +16,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import org.mindrot.bcrypt.BCrypt;
 import org.slf4j.Logger;
 
-import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Stack;
@@ -30,36 +31,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static foxo.flanty.proxyApi.settings.Language.*;
 
 public class AuthHandler extends LimboWrapper {
-
-    private final ProxyApi plugin;
     private LimboPlayer limboPlayer;
     private Player player;
-    private final Logger logger;
     boolean authStage;
-    int loginAttempts = 0;
+    byte loginAttempts = 0;
     long joinTime;
     long lastCommandTime = 0;
-    BossBar bossBar = BossBar.bossBar(Style.GOLD.style(bossBarName),1.0f, BossBar.Color.YELLOW, BossBar.Overlay.PROGRESS);
+    MiniMessage miniMessage;
+    BossBar bossBar = BossBar.bossBar(Style.GOLD.style(bossBarName), 1.0f, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
     Stack<ScheduledFuture<?>> mainExecutor = new Stack<>();
-    public AuthHandler(ProxyApi plugin, Logger logger) {
+    public AuthHandler(ProxyApi plugin, Logger logger) {//логер и плагин шото здесь нахуй не сдались, ну и ладно
         super(WrapperMode.FULL);
-        this.plugin = plugin;
-        this.logger = logger;
     }
 
     @Override
     public void handleSpawn(Limbo server, LimboPlayer limboPlayer, Player player, Logger logger) {
-        joinTime = System.currentTimeMillis();
         this.limboPlayer = limboPlayer;
         this.player = player;
         limboPlayer.disableFalling();
+        miniMessage = MiniMessage.miniMessage();
         authStage = Config.passwords.containsKey((player.getUsername()));
         if (authStage) login();
         else register();
     }
 
     private void authTime(long time) {
-        if (Config.bossBar) player.showBossBar(bossBar);//bossbar
+        long joinTime = System.currentTimeMillis();
+        if (Config.bossBar) player.showBossBar(bossBar);
         mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleWithFixedDelay(() -> {
             if (System.currentTimeMillis() - joinTime > time*1000)
                 player.disconnect(Style.RED.style(loginTimeOut));
@@ -82,44 +80,52 @@ public class AuthHandler extends LimboWrapper {
     }
 
     private void register() {
-        authTime(Config.registerTime);
-        //Title регистрации на экране
-        registrationTitle();
-        //получение ссылки авторизации от rest api бота
+        authTime(Config.registerTime);//timeout + bossbar(optional)
+        registrationTitle();//Title регистрации на экране
+        //получение ссылки авторизации и вывод ее игроку от rest api
         Auth.register(limboPlayer.getProxyPlayer().getUsername(), String.valueOf(player.getUniqueId())).thenAccept(url->
-            limboPlayer.getProxyPlayer().sendMessage(Component
-                    .text("Для регистрации перейдите по ссылке:\n", NamedTextColor.DARK_AQUA)
-                    .append(Component
-                            .text(url, NamedTextColor.WHITE, TextDecoration.ITALIC)
-                            .clickEvent(ClickEvent.openUrl(url)).decorate(TextDecoration.UNDERLINED))));
-        mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
-            if (Config.registeredPlayers.contains(player.getUsername())) {
+
+               player.sendMessage(miniMessage
+                       .deserialize(registerMessage)
+                       .appendNewline()
+                       .append(Component
+                               .text("https://discord.com/api/oauth", NamedTextColor.AQUA, TextDecoration.ITALIC)
+                               .clickEvent(ClickEvent.openUrl(url)))));
+
+        mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {//ждемс пока чел зарегается
+            if (Config.registeredPlayers.contains(player.getUsername())) {//при прохождении регистрации
                 Config.registeredPlayers.remove(player.getUsername());
-                stopSchedulers();
+                stopSchedulers();//остановка старых шедулеров которые были для регистрации, логин запустит новые
                 login();
             }
         }, 1, 3, TimeUnit.SECONDS));
     }
 
     private void login() {
+        //timeout + bossbar(optional)
         authTime(Config.authTime);
         AuthPlayer authPlayer = Config.authPlayers.get(player.getUsername());
         if (Objects.equals(authPlayer.licensedUUID, player.getUniqueId().toString())) {
-            limboPlayer.disconnect();//есть гарантия что челы с тем uuid полюбас пойдут по онлайну. Наверное......
-        } else if (authPlayer.ip.equals(player.getRemoteAddress().getAddress().toString()) && (System.currentTimeMillis() - authPlayer.timestamp) < 86400000L) {
+            limboPlayer.disconnect();//челы с fake uuid пойдут по онлайну. Наверное... не проверял :З
+            authPlayer.timestamp = System.currentTimeMillis();
+            return;
+        } else if (authPlayer.ip.equals(player.getRemoteAddress().getAddress().toString()) && (System.currentTimeMillis() - authPlayer.timestamp) < Config.loginSessionTime) {
             limboPlayer.disconnect();
             authPlayer.timestamp = System.currentTimeMillis();
+            return;
         }
-        limboPlayer.getProxyPlayer().sendMessage(Style.SCHALKER_1.style("Добро пожаловать на ").append(Style.GOLD.style(serverName)));
-        limboPlayer.getProxyPlayer().sendMessage(Style.DARK_AQUA.style("Авторизуйтесь с ").append(Style.WHITE.style("/login <пароль>")));
+        limboPlayer.getProxyPlayer().sendMessage(miniMessage
+                .deserialize(loginWelcome)
+                .appendNewline()
+                .append(miniMessage.deserialize(loginMessage)));
     }
 
     @Override
     public void handleChat(String message, String[] args, boolean isCommand) {
         if (!isCommand) return;
-        if(loginAttempts>Config.loginAttempts) player.disconnect(Style.RED.style(loginAttemptsOut));
+        if(loginAttempts>Config.loginAttempts) player.disconnect(miniMessage.deserialize(loginAttemptsOut));
         if ((System.currentTimeMillis()-lastCommandTime) <= 1500) {
-            player.sendMessage(Style.RED.style(commandDelay));
+            player.sendMessage(miniMessage.deserialize(commandDelay));
             return;
         }
         if((Objects.equals(args[0], "login") || args[0].equals("log")) && args.length == 2) {
@@ -129,12 +135,14 @@ public class AuthHandler extends LimboWrapper {
                 authPlayer.ip = String.valueOf(player.getRemoteAddress().getAddress());
                 authPlayer.timestamp = System.currentTimeMillis();
             } else {
-                limboPlayer.getProxyPlayer().sendMessage(Style.RED.style("Неверный пароль"));
+                limboPlayer.getProxyPlayer().sendMessage(miniMessage.deserialize(wrongPassword));
                 ++loginAttempts;
             }
         } else {
-            player.sendMessage(Style.RED.style("Неверная команда, пример:"));
-            player.sendMessage(Style.WHITE.style("/login <пароль>"));
+            player.sendMessage(miniMessage
+                    .deserialize(wrongCommand)
+                    .appendNewline()
+                    .append(miniMessage.deserialize(loginCommandExample)));
         }
         lastCommandTime = System.currentTimeMillis();
     }
@@ -151,6 +159,7 @@ public class AuthHandler extends LimboWrapper {
         for (ScheduledFuture<?> future : mainExecutor) {
             future.cancel(true);
         }
+        mainExecutor.clear();
     }
 
     @Override

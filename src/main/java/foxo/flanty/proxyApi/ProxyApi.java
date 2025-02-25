@@ -49,6 +49,7 @@ public class ProxyApi {
         server.getEventManager().unregisterListeners(this);
         new EventRegistrator(logger,this,server,limboFactory).register();
 
+
         EndpointRegistrator endpoints = new EndpointRegistrator(logger,this,server);
         endpoints.disable();
         endpoints.enable();

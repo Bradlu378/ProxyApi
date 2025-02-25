@@ -17,13 +17,13 @@ public class Auth {
             ctx.status(400).result("Invalid request");
             return;
         }
-        ctx.status(200);
+        ctx.status(200);//авику похуй но типа для ок логов, хз
         AuthPlayer authPlayer = Config.authPlayers.get(nickname);
         authPlayer.ip = ip;
         authPlayer.timestamp = System.currentTimeMillis();
 
-
+        if (!Config.passwords.containsKey(nickname))
+            Config.registeredPlayers.add(nickname);
         Config.passwords.put(nickname, hashedPassword);
-        //todo last ip after registration. Вроде готово?!
     }
 }
