@@ -14,7 +14,7 @@ public abstract class LimboWrapper implements LimboSessionHandler {
 
     boolean disconnectReason = false;
     Player player;
-    Stack<ScheduledFuture<?>> tasks = new Stack<>();
+    public Stack<ScheduledFuture<?>> tasks = new Stack<>();
 
     @Override
     public void onChat(String message) {

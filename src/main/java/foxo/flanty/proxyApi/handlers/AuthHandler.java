@@ -12,8 +12,6 @@ import net.elytrium.limboapi.api.player.LimboPlayer;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import org.mindrot.bcrypt.BCrypt;
@@ -21,7 +19,6 @@ import org.slf4j.Logger;
 
 import java.time.Duration;
 import java.util.Objects;
-import java.util.Stack;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,13 +28,12 @@ import static foxo.flanty.proxyApi.settings.Language.*;
 public class AuthHandler extends LimboWrapper {
     private LimboPlayer limboPlayer;
     private Player player;
-    byte loginAttempts = 0;
+    byte loginAttempts = 0;//0-3
     long lastCommandTime = 0;
     MiniMessage miniMessage;
-    BossBar bossBar = BossBar.bossBar(Style.GOLD.style(bossBarName), 1.0f, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
-    Stack<ScheduledFuture<?>> mainExecutor = new Stack<>();
+    //Stack<ScheduledFuture<?>> tasks = new Stack<>();
+    long joinTime;
     public AuthHandler(ProxyApi plugin, Logger logger) {//логер и плагин шото здесь нахуй не сдались, ну и ладно
-
     }
 
     @Override
@@ -46,15 +42,16 @@ public class AuthHandler extends LimboWrapper {
         this.player = player;
         limboPlayer.disableFalling();
         miniMessage = MiniMessage.miniMessage();
-        boolean authStage = Config.passwords.containsKey((player.getUsername()));
-        if (authStage) login();
+        if (Config.passwords.containsKey((player.getUsername())))
+            login();
         else register();
+        joinTime = System.currentTimeMillis();
     }
 
     private void authTime(long time) {
-        long joinTime = System.currentTimeMillis();
+        BossBar bossBar = BossBar.bossBar(miniMessage.deserialize(bossBarName), 1.0f, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
         if (Config.bossBar) player.showBossBar(bossBar);
-        mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleWithFixedDelay(() -> {
+        tasks.add(limboPlayer.getScheduledExecutor().scheduleWithFixedDelay(() -> {
             if (System.currentTimeMillis() - joinTime > time*1000)
                 player.disconnect(Style.RED.style(loginTimeOut));
             else
@@ -66,7 +63,7 @@ public class AuthHandler extends LimboWrapper {
         AtomicInteger step = new AtomicInteger(0);
         String[] titles = {registrationTitle1, registrationTitle2, registrationTitle3, registrationTitle4};
 
-        mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
+        tasks.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
             limboPlayer.getProxyPlayer().showTitle(
                     Title.title(
                             Component.text(titles[step.getAndIncrement() % 4]),
@@ -86,7 +83,7 @@ public class AuthHandler extends LimboWrapper {
                        .deserialize(registerMessage).append(miniMessage.deserialize(urlPlaceholder)).clickEvent(ClickEvent.openUrl(url))));
 
 
-        mainExecutor.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {//ждемс пока чел зарегается
+        tasks.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {//ждемс пока чел зарегается
             if (Config.registeredPlayers.contains(player.getUsername())) {//при прохождении регистрации
                 Config.registeredPlayers.remove(player.getUsername());
                 stopSchedulers();//остановка старых шедулеров которые были для регистрации, логин запустит новые
@@ -151,10 +148,10 @@ public class AuthHandler extends LimboWrapper {
     }
 
     private void stopSchedulers() {
-        for (ScheduledFuture<?> future : mainExecutor) {
+        for (ScheduledFuture<?> future : tasks) {
             future.cancel(true);
         }
-        mainExecutor.clear();
+        tasks.clear();
     }
 
     @Override
