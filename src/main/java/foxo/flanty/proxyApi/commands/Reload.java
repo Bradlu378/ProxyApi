@@ -13,9 +13,7 @@ public class Reload implements SimpleCommand {
     public void execute(Invocation invocation) {
         try {
             Config.proxy.reload();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -27,7 +25,6 @@ public class Reload implements SimpleCommand {
 
     @Override
     public boolean hasPermission(Invocation invocation) {
-
         return SimpleCommand.super.hasPermission(invocation);
     }
 }

@@ -20,7 +20,7 @@ public class EndpointRegistrator {
     public void enable() {
         if (app != null)
             return;
-        app = Javalin.create().start("0.0.0.0", 7000);//todo явно установил 0.0.0.0, редуцент?
+        app = Javalin.create().start(7000);
         app.post("/proxy/set-skin", Skins::setSkin);//эндпонит смены скина на стороне api
         app.put("/proxy/auth/password", Auth::setPass);//смена пароля/регистрация, 2in1.
     }
