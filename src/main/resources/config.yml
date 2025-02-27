@@ -1,0 +1,8 @@
+version: 1.0
+
+authTime: 45
+registerTime: 90
+bossBar: true
+discordLoggingEnabled: true
+loginAttempts: 3
+loginSessionTime: 12

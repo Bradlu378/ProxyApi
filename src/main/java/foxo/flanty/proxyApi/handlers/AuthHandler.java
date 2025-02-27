@@ -31,8 +31,6 @@ public class AuthHandler extends LimboWrapper {
     byte loginAttempts = 0;//0-3
     long lastCommandTime = 0;
     MiniMessage miniMessage;
-    //Stack<ScheduledFuture<?>> tasks = new Stack<>();
-    long joinTime;
     public AuthHandler(ProxyApi plugin, Logger logger) {//логер и плагин шото здесь нахуй не сдались, ну и ладно
     }
 
@@ -42,20 +40,19 @@ public class AuthHandler extends LimboWrapper {
         this.player = player;
         limboPlayer.disableFalling();
         miniMessage = MiniMessage.miniMessage();
-        if (Config.passwords.containsKey((player.getUsername())))
-            login();
+        if (Config.passwords.containsKey((player.getUsername()))) login();
         else register();
-        joinTime = System.currentTimeMillis();
     }
 
     private void authTime(long time) {
         BossBar bossBar = BossBar.bossBar(miniMessage.deserialize(bossBarName), 1.0f, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
         if (Config.bossBar) player.showBossBar(bossBar);
-        tasks.add(limboPlayer.getScheduledExecutor().scheduleWithFixedDelay(() -> {
+        long joinTime = System.currentTimeMillis();
+        tasks.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
             if (System.currentTimeMillis() - joinTime > time*1000)
                 player.disconnect(Style.RED.style(loginTimeOut));
             else
-                bossBar.progress(Math.min(1.0f, bossBar.progress()-((float) 1 /time)));
+                bossBar.progress(Math.max(0.0f, bossBar.progress() - (1.0f / time)));
         }, 0, 1, TimeUnit.SECONDS));
     }
 
@@ -68,7 +65,7 @@ public class AuthHandler extends LimboWrapper {
                     Title.title(
                             Component.text(titles[step.getAndIncrement() % 4]),
                             Component.empty(),
-                            Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO))
+                            Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO))
             );
         }, 1000, 700, TimeUnit.MILLISECONDS));
     }

@@ -1,3 +1,4 @@
+version: 1.0
 # Proxy api language.yml v1.0
 # MiniMessage
 #   styles: <bold>, <italic>, <underlined>, <strikethrough>, <obfuscated>,<reset>
@@ -5,3 +6,17 @@
 #           <dark_gray>, <blue>, <green>, <aqua>, <red>, <light_purple>, <yellow>, <white>. #E14585
 #   hex example: "<#RRGGBB> test message"
 #   gradient example: "<gradient:#RRGGBB:#RRGGBB>test gradient message</gradient>"
+
+bossBarName: "<yellow>⌚"
+loginTimeOut: "Время ожидания вышло"
+
+registerMessage: "<#E14585>Для регистрации перейдите по "
+urlPlaceholder: "<gold>[ссылке]"
+
+loginWelcome: "<#E14585>Добро пожаловать на <gold>Lactern"
+loginMessage: "<dark_aqua>Авторизуйтесь с <white>/login <пароль>"
+wrongCommand: "Неверная команда, пример: "
+loginCommandExample: "/login <пароль>"
+wrongPassword: "Неверный пароль"
+loginAttemptsOut: "Превышен лимит попыток входа"
+commandDelay: "Подождите перед следующим вводом!"

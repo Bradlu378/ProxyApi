@@ -8,7 +8,7 @@ public class Language {
     public static String registrationTitle3 = "Регистрация..";//no config
     public static String registrationTitle4 = "Регистрация...";//no config
     //public static String serverName = "Lactern"; legacy?
-    public static String bossBarName = "⌚";
+    public static String bossBarName = "<yellow>⌚";
     public static String loginTimeOut = "Время ожидания вышло";
 
 
