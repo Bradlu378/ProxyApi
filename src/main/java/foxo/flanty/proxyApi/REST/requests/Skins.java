@@ -41,11 +41,13 @@ public class Skins {
 
             @Override
             public void onResponse(Call call, Response response) {
-                if (response.isSuccessful()) {
-                    future.complete(true);
-                } else {
-                    Config.logger.error("{}{}", apiResponseError, response.code());
-                    future.complete(false);
+                try (response) {
+                    if (response.isSuccessful()) {
+                        future.complete(true);
+                    } else {
+                        Config.logger.error("{}{}", apiResponseError, response.code());
+                        future.complete(false);
+                    }
                 }
             }
         });

@@ -2,6 +2,7 @@ package foxo.flanty.proxyApi.REST.requests;
 
 import foxo.flanty.proxyApi.settings.Config;
 import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class Auth {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+                Config.logger.error(e.getMessage());
                 future.complete(new HashMap<>());
             }
 
@@ -60,15 +61,17 @@ public class Auth {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful() && response.body() != null) {
-                    String responseBody = response.body().string();
-                    JSONObject json = new JSONObject(responseBody);
-                    String url = json.getString("url");
+                try (ResponseBody body = response.body()) {
+                    if (response.isSuccessful() && body != null) {
+                        String responseBody = body.string();
+                        JSONObject json = new JSONObject(responseBody);
+                        String url = json.getString("url");
 
-                    future.complete(url);
-                } else {
-                    future.complete(null);
-                    throw new IOException(apiResponseError + response.code());
+                        future.complete(url);
+                    } else {
+                        future.complete(null);
+                        throw new IOException(apiResponseError + response.code());
+                    }
                 }
             }
         });
@@ -88,17 +91,22 @@ public class Auth {
         */
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NotNull Call call, IOException e) {
                 Config.logger.error("500",this);
                 Config.logger.error(e.getMessage());
             }
 
             @Override
-            public void onResponse(Call call, Response response) {
-                if (response.isSuccessful()) future.complete(true);
-                else {
-                    Config.logger.error("Mojang api error: " + response.code());
-                    future.complete(false);
+            public void onResponse(@NotNull Call call, @NotNull Response response) {
+                try (response) {
+                    if (response.isSuccessful()) {
+                        future.complete(true);
+                    } else {
+                        if (response.code() == 429 || response.code() == 500) {
+                            Config.logger.error("Mojang api return 429/500, need to check!");
+                        }
+                        future.complete(false);
+                    }
                 }
             }
         });
