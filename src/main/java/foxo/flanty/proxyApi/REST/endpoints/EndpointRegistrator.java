@@ -26,9 +26,9 @@ public class EndpointRegistrator {
     }
     public void disable() {
         if (app != null) {
-            app.stop();
-            app = null;
-            logger.info("Endpoints stopped");
+                app.jettyServer().stop();
+                app.stop();
+                app = null;
         }
     }
 }
