@@ -1,19 +1,18 @@
 package foxo.flanty.proxyApi.listeners;
 
-import com.velocitypowered.api.command.CommandMeta;
-import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
+import com.velocitypowered.api.event.player.GameProfileRequestEvent;
 import foxo.flanty.proxyApi.ProxyApi;
 import foxo.flanty.proxyApi.handlers.AuthHandler;
 import foxo.flanty.proxyApi.settings.Config;
 import foxo.flanty.proxyApi.utils.AuthPlayer;
 import net.elytrium.limboapi.api.Limbo;
-import net.elytrium.limboapi.api.command.LimboCommandMeta;
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
 import org.slf4j.Logger;
 
-import java.util.List;
+import java.util.UUID;
 
 public class Auth {
     private final Limbo limbo;
@@ -58,5 +57,25 @@ public class Auth {
                     event.setResult(PreLoginEvent.PreLoginComponentResult.forceOnlineMode());
                 }
         }
+    }
+
+    @Subscribe(priority = 32767)
+    public void changeUUID(GameProfileRequestEvent event) {
+
+        if(!Config.authPlayers.get(event.getUsername()).online) {
+            event.setGameProfile(event.getOriginalProfile().withId(UUID.nameUUIDFromBytes(event.getUsername().getBytes())));
+            Config.authPlayers.get(event.getUsername()).online = true;
+        } else {
+            System.out.println("generated UUID:" + UUID.nameUUIDFromBytes(event.getUsername().getBytes()));
+            System.out.println("player UUID:" + event.getGameProfile().getId());
+            System.out.println("#######################################################################\n\n\n");
+        }
+
+
+        //event.setGameProfile(event.getOriginalProfile().withId(UUID.nameUUIDFromBytes(event.getUsername().getBytes())));
+    }
+    @Subscribe(priority = 32767)
+    public void changeUUID(DisconnectEvent event) {
+        Config.authPlayers.get(event.getPlayer().getUsername()).online = false;
     }
 }

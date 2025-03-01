@@ -10,8 +10,6 @@ public class Language {
     //public static String serverName = "Lactern"; legacy?
     public static String bossBarName = "<gold>⌚";
     public static String loginTimeOut = "Время ожидания вышло";
-
-
     public static String registerMessage = "<#E14585>Для регистрации перейдите по ";
     public static String urlPlaceholder = "<gold>[ссылке]";
 

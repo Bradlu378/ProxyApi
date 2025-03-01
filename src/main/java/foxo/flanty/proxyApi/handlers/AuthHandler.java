@@ -93,12 +93,12 @@ public class AuthHandler extends LimboWrapper {
         //timeout + bossbar(optional)
         authTime(Config.authTime);
         AuthPlayer authPlayer = Config.authPlayers.get(player.getUsername());
-        if (Objects.equals(authPlayer.licensedUUID, player.getUniqueId().toString())) {
+        if (player.isOnlineMode()) {
             limboPlayer.disconnect();//челы с fake uuid пойдут по онлайну. Наверное... не проверял :З
             authPlayer.timestamp = System.currentTimeMillis();
             authPlayer.ip = player.getRemoteAddress().getAddress().toString();
             return;
-        } else if (authPlayer.ip.equals(player.getRemoteAddress().getAddress().toString()) && (System.currentTimeMillis() - authPlayer.timestamp) < Config.loginSessionTime) {
+        } else if (authPlayer.ip.equals(player.getRemoteAddress().getAddress().toString()) && (System.currentTimeMillis() - authPlayer.timestamp) < Config.loginSessionTime*3600000L) {
             limboPlayer.disconnect();
             authPlayer.timestamp = System.currentTimeMillis();
             return;
