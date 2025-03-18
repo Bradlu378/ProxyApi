@@ -61,18 +61,10 @@ public class Auth {
 
     @Subscribe(priority = 32767)
     public void changeUUID(GameProfileRequestEvent event) {
-
         if(!Config.authPlayers.get(event.getUsername()).online) {
             event.setGameProfile(event.getOriginalProfile().withId(UUID.nameUUIDFromBytes(event.getUsername().getBytes())));
             Config.authPlayers.get(event.getUsername()).online = true;
-        } else {
-            System.out.println("generated UUID:" + UUID.nameUUIDFromBytes(event.getUsername().getBytes()));
-            System.out.println("player UUID:" + event.getGameProfile().getId());
-            System.out.println("#######################################################################\n\n\n");
         }
-
-
-        //event.setGameProfile(event.getOriginalProfile().withId(UUID.nameUUIDFromBytes(event.getUsername().getBytes())));
     }
     @Subscribe(priority = 32767)
     public void changeUUID(DisconnectEvent event) {
