@@ -1,9 +1,8 @@
-package foxo.flanty.proxyApi.handlers;
+package foxo.flanty.proxyApi.modules.auth;
 
 import com.velocitypowered.api.proxy.Player;
 import foxo.flanty.proxyApi.ProxyApi;
-import foxo.flanty.proxyApi.REST.requests.Auth;
-import foxo.flanty.proxyApi.handlers.wrapper.LimboWrapper;
+import foxo.flanty.proxyApi.utils.LimboWrapper;
 import foxo.flanty.proxyApi.settings.Config;
 import foxo.flanty.proxyApi.utils.AuthPlayer;
 import foxo.flanty.proxyApi.utils.message.Style;
@@ -25,13 +24,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static foxo.flanty.proxyApi.settings.Language.*;
 
-public class AuthHandler extends LimboWrapper {
+public class LimboHandler extends LimboWrapper {
     private LimboPlayer limboPlayer;
     private Player player;
     byte loginAttempts = 0;//0-3
     long lastCommandTime = 0;
     MiniMessage miniMessage;
-    public AuthHandler(ProxyApi plugin, Logger logger) {//логер и плагин шото здесь нахуй не сдались, ну и ладно
+    public LimboHandler(ProxyApi plugin, Logger logger) {//логер и плагин шото здесь нахуй не сдались, ну и ладно
     }
 
     @Override
@@ -74,7 +73,7 @@ public class AuthHandler extends LimboWrapper {
         authTime(Config.registerTime);//timeout + bossbar(optional)
         registrationTitle();//Title регистрации на экране
         //получение ссылки авторизации и вывод ее игроку от rest api
-        Auth.register(limboPlayer.getProxyPlayer().getUsername(), String.valueOf(player.getUniqueId())).thenAccept(url->
+        Requests.register(limboPlayer.getProxyPlayer().getUsername(), String.valueOf(player.getUniqueId())).thenAccept(url->
 
                player.sendMessage(miniMessage
                        .deserialize(registerMessage).append(miniMessage.deserialize(urlPlaceholder)).clickEvent(ClickEvent.openUrl(url))));

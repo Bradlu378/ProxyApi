@@ -1,4 +1,4 @@
-package foxo.flanty.proxyApi.handlers.wrapper;
+package foxo.flanty.proxyApi.utils;
 
 import com.velocitypowered.api.proxy.Player;
 import foxo.flanty.proxyApi.settings.Config;

@@ -1,4 +1,4 @@
-package foxo.flanty.proxyApi.REST.requests;
+package foxo.flanty.proxyApi.modules.skins;
 
 import com.velocitypowered.api.proxy.Player;
 import foxo.flanty.proxyApi.settings.Config;
@@ -13,7 +13,7 @@ import static foxo.flanty.proxyApi.settings.Endpoints.skinUpdate;
 import static foxo.flanty.proxyApi.settings.Language.apiResponseError;
 import static foxo.flanty.proxyApi.settings.Language.apiUnavailable;
 
-public class Skins {
+public class Requests {
 
     public static CompletableFuture<Boolean> updateSkin(SkinProperty skinProperty, Player player) {
         CompletableFuture<Boolean> future = new CompletableFuture<>();

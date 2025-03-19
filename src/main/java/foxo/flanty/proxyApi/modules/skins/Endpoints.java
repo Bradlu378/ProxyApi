@@ -1,16 +1,15 @@
-package foxo.flanty.proxyApi.REST.endpoints;
+package foxo.flanty.proxyApi.modules.skins;
 
 import foxo.flanty.proxyApi.utils.SRUtils;
-import io.javalin.Javalin;
 import io.javalin.http.Context;
 import net.skinsrestorer.api.property.SkinProperty;
 import net.skinsrestorer.api.property.SkinVariant;
 import org.json.JSONObject;
 
 
-public class Skins {
+public class Endpoints {
 
-    static void setSkin(Context ctx) {
+    public static void setSkin(Context ctx) {
         JSONObject json = new JSONObject(ctx.body());
 
         String url = json.optString("url", null);

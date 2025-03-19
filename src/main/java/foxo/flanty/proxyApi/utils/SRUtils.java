@@ -4,16 +4,13 @@ import com.velocitypowered.api.proxy.Player;
 import foxo.flanty.proxyApi.settings.Config;
 import net.skinsrestorer.api.SkinsRestorer;
 import net.skinsrestorer.api.SkinsRestorerProvider;
-import net.skinsrestorer.api.event.SkinApplyEvent;
 import net.skinsrestorer.api.exception.DataRequestException;
 import net.skinsrestorer.api.exception.MineSkinException;
 import net.skinsrestorer.api.property.SkinApplier;
 import net.skinsrestorer.api.property.SkinProperty;
 import net.skinsrestorer.api.property.SkinVariant;
-import okhttp3.*;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Optional;
 
 public class SRUtils {

@@ -1,4 +1,4 @@
-package foxo.flanty.proxyApi.listeners;
+package foxo.flanty.proxyApi.modules.skins;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.proxy.Player;
@@ -9,9 +9,9 @@ import net.skinsrestorer.api.property.SkinProperty;
 
 import java.util.Optional;
 
-import static foxo.flanty.proxyApi.REST.requests.Skins.updateSkin;
+import static foxo.flanty.proxyApi.modules.skins.Requests.updateSkin;
 
-public class Skins {
+public class ProxyEventListener {
 
     @Subscribe
     public void onSkinApply(SkinApplyEvent event) {

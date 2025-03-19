@@ -1,4 +1,4 @@
-package foxo.flanty.proxyApi.REST.requests;
+package foxo.flanty.proxyApi.modules.discord;
 
 import foxo.flanty.proxyApi.settings.Config;
 import okhttp3.*;
@@ -8,7 +8,12 @@ import static foxo.flanty.proxyApi.settings.Endpoints.discordLogger;
 import static foxo.flanty.proxyApi.settings.Language.apiUnavailable;
 
 
+//todo: нахуя я это писал?
+//в любом случае хуета не дописанная, так и не согласованная с авиком
+
+@Deprecated(forRemoval = true)
 public class DiscordLogger {
+
     public static void log(String message, String channel, LogLevel logLevel) {
         String json = String.format(
                 "{\"channel\": \"%s\", \"level\": \"%s\", \"location\": \"%s\", \"message\": \"%s\"}",
