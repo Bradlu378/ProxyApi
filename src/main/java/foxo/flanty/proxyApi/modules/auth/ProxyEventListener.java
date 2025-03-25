@@ -7,6 +7,7 @@ import com.velocitypowered.api.event.player.GameProfileRequestEvent;
 import foxo.flanty.proxyApi.ProxyApi;
 import foxo.flanty.proxyApi.settings.Config;
 import foxo.flanty.proxyApi.utils.AuthPlayer;
+import io.javalin.http.util.JsonEscapeUtil;
 import net.elytrium.limboapi.api.Limbo;
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
 import org.slf4j.Logger;
@@ -27,17 +28,18 @@ public class ProxyEventListener {
 
     /**
      * комментарий для тупых
+     *
      */
-    //@Subscribe(priority = 32767)
-    //public void onLogin(LoginLimboRegisterEvent event) {
-    //    event.addOnJoinCallback(() -> limbo.spawnPlayer(event.getPlayer(), new LimboHandler(proxy, logger)));
-    //}
+    @Subscribe(priority = 32767)
+    public void onLogin(LoginLimboRegisterEvent event) {
+        event.addOnJoinCallback(() -> limbo.spawnPlayer(event.getPlayer(), new LimboHandler(proxy, logger)));
+    }
 
 
     /**
      * установка типа игрока online/offline
      * <p>
-     * p.s. спустя время я смотрю на свой же код понимая шо нихуя не понимаю
+     * p.s. спустя время я смотря на свой же код понимаю, шо ни хуя не понимаю
      */
     @Subscribe(priority = 32767)
     public void onPreLoginEvent(PreLoginEvent event) {
@@ -76,6 +78,7 @@ public class ProxyEventListener {
     @Subscribe(priority = 32767)
     public void changeUUID(GameProfileRequestEvent event) {
         if(!Config.authPlayers.get(event.getUsername()).online) {
+            System.out.println("ПИЗДА");
             event.setGameProfile(event.getOriginalProfile().withId(UUID.nameUUIDFromBytes(event.getUsername().getBytes())));
             Config.authPlayers.get(event.getUsername()).online = true;
         }

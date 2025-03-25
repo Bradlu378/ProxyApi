@@ -18,9 +18,9 @@ public class ProxyEventListener {
         Player player = event.getPlayer(Player.class);
         Optional<SkinProperty> oldSkin = SRUtils.getSkin(player);
         updateSkin(event.getProperty(), player).thenAccept(success -> {
-            if (success) Config.logger.info(player.getUsername() + "updated skin");
-            else if (oldSkin.isPresent() && SRUtils.setSkin(oldSkin.get(), player.getUsername()) == 1)
-                Config.logger.warn(player.getUsername() + ":skin change failed x2");//чел ахуел думаю
+            //if (success) Config.logger.info(player.getUsername() + "updated skin");//todo БЛЯТЬ ТУТ ЦИКЛ ХУЕВ
+            //else if (oldSkin.isPresent() && SRUtils.setSkin(oldSkin.get(), player.getUsername()) == 1)//todo заглугка комментом
+                //Config.logger.warn(player.getUsername() + ":skin change failed x2");//чел ахуел думаю
         });
     }
 

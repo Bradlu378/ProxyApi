@@ -9,6 +9,7 @@ import net.skinsrestorer.api.exception.MineSkinException;
 import net.skinsrestorer.api.property.SkinApplier;
 import net.skinsrestorer.api.property.SkinProperty;
 import net.skinsrestorer.api.property.SkinVariant;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Optional;
@@ -66,7 +67,12 @@ public class SRUtils {
         String json = new String(java.util.Base64.getDecoder().decode(base64));
         JSONObject jsonObject = new JSONObject(json);
         String skinUrl = jsonObject.getJSONObject("textures").getJSONObject("SKIN").getString("url");
-        String variant = jsonObject.getJSONObject("textures").getJSONObject("SKIN").getJSONObject("metadata").getString("model");
+        String variant;
+        try {//todo костыль тк metadata если скин не slim тупо нету
+            variant = jsonObject.getJSONObject("textures").getJSONObject("SKIN").getJSONObject("metadata").getString("model");
+        } catch (JSONException e) {
+            variant = "CLASSIC";
+        }
         return new String[]{skinUrl, variant};
     }
 }

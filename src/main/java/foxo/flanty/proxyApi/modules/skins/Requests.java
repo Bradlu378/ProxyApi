@@ -21,11 +21,11 @@ public class Requests {
         String texture = skinProperty.getValue();
         String sign = skinProperty.getSignature();
         String playerName = player.getUsername();
-        String skinUrl = SRUtils.textureDecode(skinProperty.getValue())[1];
+        String base64 = SRUtils.textureDecode(skinProperty.getValue())[1];//todo donwload png n convert to base64
 
         String json = String.format(
-                "{\"texture\": \"%s\", \"sign\": \"%s\", \"player\": \"%s\", \"skin_url\": \"%s\"}",
-                texture, sign, playerName, skinUrl
+                "{\"texture\": \"%s\", \"sign\": \"%s\", \"player\": \"%s\", \"base64\": \"%s\"}",//todo все нахуй и авику надо только texture hash (ссылка на скин и тот hash в ней)
+                texture, sign, playerName, base64
         );
 
         OkHttpClient client = new OkHttpClient();
@@ -35,7 +35,7 @@ public class Requests {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Config.logger.error(apiUnavailable, e);
+                Config.logger.error(apiUnavailable + ": " + skinUpdate);
                 future.complete(false);
             }
 
@@ -45,7 +45,7 @@ public class Requests {
                     if (response.isSuccessful()) {
                         future.complete(true);
                     } else {
-                        Config.logger.error("{}{}", apiResponseError, response.code());
+                        Config.logger.error("", apiResponseError, response.code());
                         future.complete(false);
                     }
                 }
