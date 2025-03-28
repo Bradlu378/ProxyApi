@@ -10,6 +10,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import foxo.flanty.proxyApi.commands.Skin;
 import foxo.flanty.proxyApi.modules.auth.Requests;
 import foxo.flanty.proxyApi.commands.Reload;
 import foxo.flanty.proxyApi.settings.Config;
@@ -74,6 +75,8 @@ public class ProxyApi {
         CommandManager commandManager = server.getCommandManager();
         commandManager.unregister("reload");
         commandManager.register("reload", new Reload());
+        commandManager.unregister("skin");
+        commandManager.register("skin", new Skin());
     }
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {

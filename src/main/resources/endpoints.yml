@@ -1,5 +1,5 @@
 MojangAPI: "https://api.minecraftservices.com/minecraft/profile/lookup/"
-skinUpdate: "http://127.0.0.1:8000/api/player-skinchange" # PUT
+skinUpdate: "http://127.0.0.1:8000/api/skins/{nickname}/minecraft" # PUT
 playerPasswordsHashes: "http://127.0.0.1:8000/api/passwords" # GET
 playerRegister: "http://127.0.0.1:8000/api/auth/login" # GET ?username=nickname
 discordLogger: "http://127.0.0.1:8000/api/notify/log" # POST //channel, level, location, message

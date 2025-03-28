@@ -6,12 +6,14 @@ import net.skinsrestorer.api.SkinsRestorer;
 import net.skinsrestorer.api.SkinsRestorerProvider;
 import net.skinsrestorer.api.exception.DataRequestException;
 import net.skinsrestorer.api.exception.MineSkinException;
+import net.skinsrestorer.api.property.MojangSkinDataResult;
 import net.skinsrestorer.api.property.SkinApplier;
 import net.skinsrestorer.api.property.SkinProperty;
 import net.skinsrestorer.api.property.SkinVariant;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class SRUtils {
@@ -21,42 +23,81 @@ public class SRUtils {
         api = SkinsRestorerProvider.get();
         applier = api.getSkinApplier(Player.class);
     }
+    private static final Map<String,SkinProperty> lastSkin = new HashMap<>();
 
 
     /**
      * @param skinUrl skin png url
-     * @param playerName player nickname
+     * @param nickname player nickname
      * @param variant skin type SLIM/CLASSIC
      * @return 0: ok, 1: no player, 2: skin set error.
      */
-    public static byte setSkin(String skinUrl, String playerName, SkinVariant variant) {
-        Optional<SkinProperty> skin;
-        Optional<Player> player = Config.proxyServer.getPlayer(playerName);
+    public static byte setSkin(String skinUrl, String nickname, SkinVariant variant, boolean rollback) {
+
+        SkinProperty skin;
+        Optional<Player> player = Config.proxyServer.getPlayer(nickname);
         if (player.isEmpty()) return 1;
         try {
-            skin = Optional.of(api.getMineSkinAPI().genSkin(skinUrl, variant).getProperty());
+            skin = api.getMineSkinAPI().genSkin(skinUrl, variant).getProperty();
         } catch (MineSkinException | DataRequestException e) {
             return 2;
         }
-        applier.applySkin(player.get(),skin.get());
+        Optional<SkinProperty> skinProperty = api.getPlayerStorage().getSkinOfPlayer(player.get().getUniqueId());
+        if (skinProperty.isEmpty()) {
+            skinProperty = Optional.of(SkinProperty.of("1", "1"));
+        }
+        if (!rollback) lastSkin.put(player.get().getUsername(), skinProperty.get());
+        applier.applySkin(player.get(),skin);
         return 0;
     }
 
     /**
      * @param property skin base64
-     * @param playerName player nickname
-     * @return 0: ok, 1: player offline
+     * @param nickname player nickname
+     * @return 0: ok, 1: no player.
      */
-    public static byte setSkin(SkinProperty property, String playerName) {
-        Optional<Player> player = Config.proxyServer.getPlayer(playerName);
+    public static byte setSkin(SkinProperty property, String nickname, boolean rollback) {
+        Optional<Player> player = Config.proxyServer.getPlayer(nickname);
         if (player.isEmpty()) return 1;
+        Optional<SkinProperty> skinProperty = api.getPlayerStorage().getSkinOfPlayer(player.get().getUniqueId());
+        if (skinProperty.isEmpty()) {
+            skinProperty = Optional.of(SkinProperty.of("1", "1"));
+        }
+        if (!rollback) lastSkin.put(player.get().getUsername(), skinProperty.get());
         applier.applySkin(player.get(),property);
         return 0;
     }
 
+    /**
+     * @param skinNickname skin base64
+     * @param nickname player nickname
+     * @return 0: ok, 1: no player, 2: skin set error.
+     */
+    public static byte setSkin(String skinNickname, String nickname, boolean rollback) throws DataRequestException {
+       Optional<MojangSkinDataResult> skin = api.getMojangAPI().getSkin(skinNickname);
+        if (skin.isEmpty()) return 2;
+        Optional<Player> player = Config.proxyServer.getPlayer(nickname);
+        if (player.isEmpty()) return 1;
+        Optional<SkinProperty> skinProperty = api.getPlayerStorage().getSkinOfPlayer(player.get().getUniqueId());
+        if (skinProperty.isEmpty()) {
+            skinProperty = Optional.of(SkinProperty.of("1", "1"));
+        }
+        if (!rollback) lastSkin.put(player.get().getUsername(), skinProperty.get());
+        applier.applySkin(player.get(),skin.get().getSkinProperty());
+        return 0;
+    }
+
     public static Optional<SkinProperty> getSkin(Player player) {
+        applier.;
+
+
         return api.getPlayerStorage().getSkinOfPlayer(player.getUniqueId());
     }
+    public static Optional<SkinProperty> lastSkin(String nickname) {
+        return Optional.ofNullable(lastSkin.get(nickname));
+    }
+
+
 
     /**
      * Возвращает ссылку на скин и тип скина
@@ -68,11 +109,10 @@ public class SRUtils {
         JSONObject jsonObject = new JSONObject(json);
         String skinUrl = jsonObject.getJSONObject("textures").getJSONObject("SKIN").getString("url");
         String variant;
-        try {//todo костыль тк metadata если скин не slim тупо нету
-            variant = jsonObject.getJSONObject("textures").getJSONObject("SKIN").getJSONObject("metadata").getString("model");
-        } catch (JSONException e) {
-            variant = "CLASSIC";
-        }
-        return new String[]{skinUrl, variant};
+        if(jsonObject.getJSONObject("textures").getJSONObject("SKIN").isNull("metadata")) variant = "classic";
+        else variant = "slim";
+
+        String textureId = skinUrl.substring(skinUrl.lastIndexOf("/") + 1);
+        return new String[]{skinUrl, variant, textureId};
     }
 }

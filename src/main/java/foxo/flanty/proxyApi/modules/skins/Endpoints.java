@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 public class Endpoints {
     /**
-     * url+nickname+skinType/texture+sign
+     * url+nickname+skinType/texture+sign+nickname
      * 400 - bad request
      * 404 - no player online /todo make queue
      * 500 - skin set error
@@ -29,7 +29,7 @@ public class Endpoints {
 
         if (url != null) {
             try {
-                short code = SRUtils.setSkin(url, player, SkinVariant.valueOf(variant.toUpperCase()));
+                short code = SRUtils.setSkin(url, player, SkinVariant.valueOf(variant.toUpperCase()), false);
                 ctx.status(code == 1 ? 404 : code == 2 ? 500 : 200);
                 return;
             } catch (IllegalArgumentException ignored) {
@@ -38,7 +38,7 @@ public class Endpoints {
         }
 
         if (texture != null && sign != null) {
-            short code = SRUtils.setSkin(SkinProperty.of(texture, sign), player);
+            short code = SRUtils.setSkin(SkinProperty.of(texture, sign), player, false);
             ctx.status(code == 1 ? 404 : code == 2 ? 500 : 200);
             return;
         }

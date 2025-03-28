@@ -78,7 +78,6 @@ public class ProxyEventListener {
     @Subscribe(priority = 32767)
     public void changeUUID(GameProfileRequestEvent event) {
         if(!Config.authPlayers.get(event.getUsername()).online) {
-            System.out.println("ПИЗДА");
             event.setGameProfile(event.getOriginalProfile().withId(UUID.nameUUIDFromBytes(event.getUsername().getBytes())));
             Config.authPlayers.get(event.getUsername()).online = true;
         }
