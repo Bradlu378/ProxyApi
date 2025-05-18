@@ -1,6 +1,6 @@
 package foxo.flanty.proxyApi.modules.skins;
 
-import foxo.flanty.proxyApi.utils.SRUtils;
+import foxo.flanty.proxyApi.utils.SkinRestorer.SRUtils;
 import io.javalin.http.Context;
 import net.skinsrestorer.api.property.SkinProperty;
 import net.skinsrestorer.api.property.SkinVariant;
@@ -11,7 +11,7 @@ public class Endpoints {
     /**
      * url+nickname+skinType/texture+sign+nickname
      * 400 - bad request
-     * 404 - no player online /todo make queue
+     * 404 - no player online
      * 500 - skin set error
      */
     public static void setSkin(Context ctx) {
@@ -29,7 +29,7 @@ public class Endpoints {
 
         if (url != null) {
             try {
-                short code = SRUtils.setSkin(url, player, SkinVariant.valueOf(variant.toUpperCase()), false);
+                short code = (short) SRUtils.setSkin(url, player, SkinVariant.valueOf(variant.toUpperCase())).ordinal();
                 ctx.status(code == 1 ? 404 : code == 2 ? 500 : 200);
                 return;
             } catch (IllegalArgumentException ignored) {
@@ -38,7 +38,7 @@ public class Endpoints {
         }
 
         if (texture != null && sign != null) {
-            short code = SRUtils.setSkin(SkinProperty.of(texture, sign), player, false);
+            short code = (short) SRUtils.setSkin(SkinProperty.of(texture, sign), player).ordinal();
             ctx.status(code == 1 ? 404 : code == 2 ? 500 : 200);
             return;
         }

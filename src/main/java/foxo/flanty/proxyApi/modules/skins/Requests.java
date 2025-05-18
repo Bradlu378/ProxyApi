@@ -2,7 +2,7 @@ package foxo.flanty.proxyApi.modules.skins;
 
 import com.velocitypowered.api.proxy.Player;
 import foxo.flanty.proxyApi.settings.Config;
-import foxo.flanty.proxyApi.utils.SRUtils;
+import foxo.flanty.proxyApi.utils.SkinRestorer.SRUtils;
 import net.skinsrestorer.api.property.SkinProperty;
 import okhttp3.*;
 
@@ -24,7 +24,7 @@ public class Requests {
 
         String json = String.format(
                 "{\"new_hash\": \"%s\", \"new_signature\": \"%s\", \"new_value\": \"%s\", \"new_variant\": \"%s\"}",
-                decodedTexture[1], sign, texture, decodedTexture[2]
+                decodedTexture[2], sign, texture, decodedTexture[1]
         );
 
         OkHttpClient client = new OkHttpClient();
@@ -44,7 +44,7 @@ public class Requests {
                     if (response.isSuccessful()) {
                         future.complete(true);
                     } else {
-                        Config.logger.error(apiResponseError, response.code());
+                        Config.logger.error(apiResponseError + " " + response.code());
                         future.complete(false);
                     }
                 }

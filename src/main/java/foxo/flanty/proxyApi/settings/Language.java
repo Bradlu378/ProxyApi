@@ -20,5 +20,8 @@ public class Language {
     public static String wrongPassword = "Неверный пароль";
     public static String loginAttemptsOut = "Превышен лимит попыток входа";
     public static String commandDelay = "Подождите перед следующим вводом!";
+    public static String skinChangeError = "<red>Произошла ошибка при смене скина, попробуйте позже";
+    public static String skinChangeSuccess = "Скин успешно установлен";//todo добавить сообщения в чат
+    public static String wrongCommandSkinUrlType = "<red>Неверный тип скина, Пример: /skin set <url> <slim/classic>";
 
 }

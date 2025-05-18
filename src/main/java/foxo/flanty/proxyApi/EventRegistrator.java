@@ -35,6 +35,7 @@ public class EventRegistrator {
         limbo = factory.createLimbo(world).registerCommand(new LimboCommandMeta(List.of("login", "log"))).setName("Auth");
 
         eventManager.register(proxyApi, new foxo.flanty.proxyApi.modules.auth.ProxyEventListener(proxyApi,limbo,logger));
+        eventManager.register(proxyApi, new foxo.flanty.proxyApi.modules.player.ProxyEventListener(proxyApi,logger));
         SkinsRestorerProvider.get().getEventBus().subscribe(proxyApi, SkinApplyEvent.class, new ProxyEventListener()::onSkinApply);
 
     }

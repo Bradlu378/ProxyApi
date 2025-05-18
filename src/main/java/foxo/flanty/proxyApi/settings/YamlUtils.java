@@ -82,6 +82,9 @@ public class YamlUtils {
         Language.wrongPassword = getString(data, "wrongPassword", Language.wrongPassword);
         Language.loginAttemptsOut = getString(data, "loginAttemptsOut", Language.loginAttemptsOut);
         Language.commandDelay = getString(data, "commandDelay", Language.commandDelay);
+        Language.skinChangeError = getString(data, "skinChangeError", Language.skinChangeError);
+        Language.skinChangeSuccess = getString(data, "skinChangeSuccess", Language.skinChangeSuccess);
+        Language.wrongCommandSkinUrlType = getString(data, "wrongCommandSkinUrlType", Language.wrongCommandSkinUrlType);
 
         return true;
     }

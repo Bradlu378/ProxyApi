@@ -1,4 +1,4 @@
-package foxo.flanty.proxyApi;
+/*package foxo.flanty.proxyApi;
 
 import net.skinsrestorer.api.PropertyUtils;
 import net.skinsrestorer.api.SkinsRestorer;
@@ -152,3 +152,4 @@ public class SkinsRestorerAPIExample  {
         return true;
     }
 }
+*/

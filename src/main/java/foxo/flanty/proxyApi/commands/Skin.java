@@ -2,13 +2,15 @@ package foxo.flanty.proxyApi.commands;
 
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
-import foxo.flanty.proxyApi.utils.SRUtils;
+import foxo.flanty.proxyApi.utils.SkinRestorer.SRUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.skinsrestorer.api.exception.DataRequestException;
 import net.skinsrestorer.api.property.SkinVariant;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import static foxo.flanty.proxyApi.settings.Language.wrongCommandSkinUrlType;
 
 public class Skin implements SimpleCommand {
 
@@ -55,11 +57,11 @@ public class Skin implements SimpleCommand {
                     player.sendMessage(MiniMessage.miniMessage().deserialize("Неверная команда"));//todo lang
                     return;
                 }
-                if (!List.of("slim", "classic").contains(args[1].toLowerCase())) {
-                    player.sendMessage(MiniMessage.miniMessage().deserialize("Неверный тип скина"));//todo lang
+                if (!List.of("slim", "classic").contains(args[2].toLowerCase())) {
+                    player.sendMessage(MiniMessage.miniMessage().deserialize(wrongCommandSkinUrlType));
                     return;
                 }
-                SRUtils.setSkin(args[2], player.getUsername(), SkinVariant.SLIM, false);
+                SRUtils.setSkin(args[1], player.getUsername(), SkinVariant.valueOf(args[2].toUpperCase()));
             }
             case NICKNAME-> {
                 if (args.length != 2) {
@@ -67,7 +69,7 @@ public class Skin implements SimpleCommand {
                     return;
                 }
                 try {
-                    SRUtils.setSkin(args[1], player.getUsername(), false);
+                    SRUtils.setSkin(args[1], player.getUsername());
                 } catch (DataRequestException e) {
                     throw new RuntimeException(e);
                 }
