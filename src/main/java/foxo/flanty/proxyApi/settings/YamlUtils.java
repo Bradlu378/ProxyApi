@@ -32,7 +32,6 @@ public class YamlUtils {
         return true;
     }
     public static boolean loadConfigs(Path configDir) {
-
         return loadConfig(configDir.resolve("config.yml")) &&
         loadEndpoints(configDir.resolve("endpoints.yml")) &&
         loadLanguage(configDir.resolve("language.yml"));
@@ -49,7 +48,7 @@ public class YamlUtils {
         Config.discordLoggingEnabled = getBoolean(data, "discordLoggingEnabled", Config.discordLoggingEnabled);
         Config.loginAttempts = getInt(data, "loginAttempts", Config.loginAttempts);
         Config.loginSessionTime = getInt(data, "loginSessionTime", Config.loginSessionTime);
-
+        Config.httpPort = getInt(data, "httpPort", Config.httpPort);
         return true;
     }
 

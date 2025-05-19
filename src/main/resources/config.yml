@@ -6,3 +6,4 @@ bossBar: true
 discordLoggingEnabled: true
 loginAttempts: 3
 loginSessionTime: 12
+httpPort: 7000

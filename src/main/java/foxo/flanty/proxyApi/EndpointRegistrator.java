@@ -2,6 +2,7 @@ package foxo.flanty.proxyApi;
 
 import com.velocitypowered.api.proxy.ProxyServer;
 import foxo.flanty.proxyApi.modules.skins.Endpoints;
+import foxo.flanty.proxyApi.settings.Config;
 import io.javalin.Javalin;
 import org.slf4j.Logger;
 
@@ -20,7 +21,7 @@ public class EndpointRegistrator {
     public void enable() {
         if (app != null)
             return;
-        app = Javalin.create().start(7000);
+        app = Javalin.create().start(Config.httpPort);
         app.post("/proxy/set-skin", Endpoints::setSkin);//эндпонит смены скина на стороне api
         app.put("/proxy/auth/password", foxo.flanty.proxyApi.modules.auth.Endpoints::setPass);//смена пароля/регистрация, 2in1.
     }

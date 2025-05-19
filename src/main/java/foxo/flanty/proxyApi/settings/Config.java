@@ -20,6 +20,7 @@ public class Config {
     public static boolean discordLoggingEnabled = true;
     public static int loginAttempts = 3;
     public static int loginSessionTime = 12;//hours
+    public static int httpPort = 7000;
 
 
 }
