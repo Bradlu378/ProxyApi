@@ -59,6 +59,7 @@ public class YamlUtils {
         Endpoints.MojangAPI = getString(data, "MojangAPI", Endpoints.MojangAPI);
         Endpoints.skinUpdate = getString(data, "skinUpdate", Endpoints.skinUpdate);
         Endpoints.playerJoin = getString(data, "playerJoin", Endpoints.playerJoin);
+        Endpoints.playerLoginRequest = getString(data, "playerLoginRequest", Endpoints.playerLoginRequest);
 
         return true;
     }
@@ -74,7 +75,6 @@ public class YamlUtils {
         Language.loginWelcome = getString(data, "loginWelcome", Language.loginWelcome);
         Language.loginMessage = getString(data, "loginMessage", Language.loginMessage);
         Language.wrongCommand = getString(data, "wrongCommand", Language.wrongCommand);
-        Language.loginCommandExample = getString(data, "loginCommandExample", Language.loginCommandExample);
         Language.wrongPassword = getString(data, "wrongPassword", Language.wrongPassword);
         Language.loginAttemptsOut = getString(data, "loginAttemptsOut", Language.loginAttemptsOut);
         Language.commandDelay = getString(data, "commandDelay", Language.commandDelay);

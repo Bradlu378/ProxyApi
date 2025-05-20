@@ -31,7 +31,12 @@ public class ProxyEventListener {
         this.limbo = limbo;
         this.logger = logger;
     }
-
+    @Subscribe(priority = 32767)
+    public void onPreLoginEvent(PreLoginEvent event) {
+        Config.authPlayers.put(event.getUsername(), new AuthPlayer(event.getConnection().getRemoteAddress().toString(),
+                0L,
+                 false));
+    }
 
     /**
      * комментарий для тупых
@@ -40,7 +45,7 @@ public class ProxyEventListener {
     @Subscribe(priority = 32767)
     public void onLogin(LoginLimboRegisterEvent event) {
         Player player = event.getPlayer();
-        Login login = getLoginRequest(player.getUsername(), player.getUniqueId().toString(),player.getRemoteAddress().toString()).join();//пошло оно все нахуй, мне поебать
+        Login login = getLoginRequest(player.getUsername(), player.getUniqueId().toString(),player.getRemoteAddress().getAddress().toString()).join();//пошло оно все нахуй, мне поебать
         System.out.println(login.toString());
         if (!login.is_whitelisted) player.disconnect(Component.text("You are not whitelisted", NamedTextColor.RED));//опять же поебать будет база
         if (login.is_logged_in) AuthedPlayers.add(player.getUsername());

@@ -33,7 +33,7 @@ public class Requests {
                     future.complete(null);
                 }
                     JSONObject json = new JSONObject(response.body().string());
-                    Login login = new Login(
+                Login login = new Login(
                             json.getBoolean("is_whitelisted"),
                             json.getBoolean("is_logged_in"),
                             json.getString("url"));

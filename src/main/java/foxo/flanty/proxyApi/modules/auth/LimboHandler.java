@@ -54,11 +54,11 @@ public class LimboHandler extends LimboWrapper {
     private void needLogin() {
         authTime(Config.authTime);
         AuthPlayer authPlayer = Config.authPlayers.get(player.getUsername());
-         if (authPlayer.ip.equals(player.getRemoteAddress().getAddress().toString()) && (System.currentTimeMillis() - authPlayer.timestamp) < Config.loginSessionTime*3600000L) {
-            limboPlayer.disconnect();
-            authPlayer.timestamp = System.currentTimeMillis();
-            return;
-        }
+         //if (authPlayer.ip.equals(player.getRemoteAddress().getAddress().toString()) && (System.currentTimeMillis() - authPlayer.timestamp) < Config.loginSessionTime*3600000L) {
+         //   limboPlayer.disconnect();
+         //   authPlayer.timestamp = System.currentTimeMillis();
+         //   return;
+         //}
          if (AuthedPlayers.contains(player.getUsername())) {
              limboPlayer.disconnect();//ваще похуй, я строю на костях старой системы
              AuthedPlayers.remove(player.getUsername());

@@ -11,7 +11,6 @@ public class Language {
     public static String loginWelcome = "<#E14585>Добро пожаловать на <gold>HuiCity";
     public static String loginMessage = "<dark_aqua>Перейдите по ссылке: ";
     public static String wrongCommand = "Неверная команда, пример: ";
-    public static String loginCommandExample = "/login <пароль>";
     public static String wrongPassword = "Неверный пароль";
     public static String loginAttemptsOut = "Превышен лимит попыток входа";
     public static String commandDelay = "Подождите перед следующим вводом!";
