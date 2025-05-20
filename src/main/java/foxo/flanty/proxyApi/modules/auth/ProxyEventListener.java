@@ -41,6 +41,7 @@ public class ProxyEventListener {
     public void onLogin(LoginLimboRegisterEvent event) {
         Player player = event.getPlayer();
         Login login = getLoginRequest(player.getUsername(), player.getUniqueId().toString(),player.getRemoteAddress().toString()).join();//пошло оно все нахуй, мне поебать
+        System.out.println(login.toString());
         if (!login.is_whitelisted) player.disconnect(Component.text("You are not whitelisted", NamedTextColor.RED));//опять же поебать будет база
         if (login.is_logged_in) AuthedPlayers.add(player.getUsername());
         event.addOnJoinCallback(() -> limbo.spawnPlayer(event.getPlayer(), new LimboHandler(proxy, logger, login)));

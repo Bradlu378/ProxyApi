@@ -10,4 +10,13 @@ public class Login {
         this.is_logged_in = is_logged_in;
         this.url = url;
     }
+
+    @Override
+    public String toString() {
+        return "Login{" +
+                "is_whitelisted=" + is_whitelisted +
+                ", is_logged_in=" + is_logged_in +
+                ", url='" + url + '\'' +
+                '}';
+    }
 }

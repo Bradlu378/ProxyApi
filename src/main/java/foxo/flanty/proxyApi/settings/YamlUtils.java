@@ -58,9 +58,6 @@ public class YamlUtils {
 
         Endpoints.MojangAPI = getString(data, "MojangAPI", Endpoints.MojangAPI);
         Endpoints.skinUpdate = getString(data, "skinUpdate", Endpoints.skinUpdate);
-        Endpoints.playerPasswordsHashes = getString(data, "playerPasswordsHashes", Endpoints.playerPasswordsHashes);
-        Endpoints.playerRegister = getString(data, "playerRegister", Endpoints.playerRegister);
-        Endpoints.discordLogger = getString(data, "discordLogger", Endpoints.discordLogger);
         Endpoints.playerJoin = getString(data, "playerJoin", Endpoints.playerJoin);
 
         return true;

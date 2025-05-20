@@ -34,7 +34,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.mindrot.bcrypt:bcrypt:0.3'//bcrypt
     compileOnly 'net.skinsrestorer:skinsrestorer-api:15.5.2'//skin restorer
     implementation 'org.json:json:20250107'//json :/
     implementation("io.javalin:javalin:6.4.0")//javalin - endpoint framework
