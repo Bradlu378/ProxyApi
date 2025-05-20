@@ -4,15 +4,22 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.player.GameProfileRequestEvent;
+import com.velocitypowered.api.proxy.Player;
 import foxo.flanty.proxyApi.ProxyApi;
 import foxo.flanty.proxyApi.settings.Config;
 import foxo.flanty.proxyApi.utils.AuthPlayer;
 import io.javalin.http.util.JsonEscapeUtil;
 import net.elytrium.limboapi.api.Limbo;
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
+import net.elytrium.limboapi.api.player.LimboPlayer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 
 import java.util.UUID;
+
+import static foxo.flanty.proxyApi.modules.auth.Requests.getLoginRequest;
+import static foxo.flanty.proxyApi.settings.Config.AuthedPlayers;
 
 public class ProxyEventListener {
     private final Limbo limbo;
@@ -32,42 +39,11 @@ public class ProxyEventListener {
      */
     @Subscribe(priority = 32767)
     public void onLogin(LoginLimboRegisterEvent event) {
-        event.addOnJoinCallback(() -> limbo.spawnPlayer(event.getPlayer(), new LimboHandler(proxy, logger)));
-    }
-
-
-    /**
-     * установка типа игрока online/offline
-     * <p>
-     * p.s. спустя время я смотря на свой же код понимаю, шо ни хуя не понимаю
-     */
-    @Subscribe(priority = 32767)
-    public void onPreLoginEvent(PreLoginEvent event) {
-        String uuid = event.getUniqueId().toString();
-        String username = event.getUsername();
-        AuthPlayer authPlayer = Config.authPlayers.get(username);
-        boolean sameUUID = Requests.isLicense(uuid).join();
-
-        if (authPlayer != null) {
-            if (System.currentTimeMillis() - authPlayer.licenseTimestamp > 43200000L | authPlayer.licensedUUID == null) {//обновление uuid если старше 12ч
-                    if (sameUUID) {
-                        authPlayer.licenseTimestamp = System.currentTimeMillis();
-                        authPlayer.licensedUUID = uuid;
-                        event.setResult(PreLoginEvent.PreLoginComponentResult.forceOnlineMode());
-                    }
-            } else if (uuid.equals(authPlayer.licensedUUID))
-                event.setResult(PreLoginEvent.PreLoginComponentResult.forceOnlineMode());
-        } else {
-                Config.authPlayers.put(
-                        username,
-                        new AuthPlayer(event.getConnection().getRemoteAddress().toString(),
-                                0L,
-                                sameUUID ? uuid : null,
-                                System.currentTimeMillis()));
-                if (sameUUID){
-                    event.setResult(PreLoginEvent.PreLoginComponentResult.forceOnlineMode());
-                }
-        }
+        Player player = event.getPlayer();
+        Login login = getLoginRequest(player.getUsername(), player.getUniqueId().toString(),player.getRemoteAddress().toString()).join();//пошло оно все нахуй, мне поебать
+        if (!login.is_whitelisted) player.disconnect(Component.text("You are not whitelisted", NamedTextColor.RED));//опять же поебать будет база
+        if (login.is_logged_in) AuthedPlayers.add(player.getUsername());
+        event.addOnJoinCallback(() -> limbo.spawnPlayer(event.getPlayer(), new LimboHandler(proxy, logger, login)));
     }
 
     /**

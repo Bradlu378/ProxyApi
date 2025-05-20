@@ -10,20 +10,17 @@ public class Endpoints {
         JSONObject json = new JSONObject(ctx.body());
 
         String nickname = json.optString("nickname", null);
-        String hashedPassword = json.optString("password", null);
         String ip = json.optString("ip", null);
 
-        if (nickname == null | hashedPassword == null){
-            ctx.status(400).result("Invalid request");
-            return;
+        if(nickname == null && ip == null) {
+            ctx.status(400);
+            ctx.result("Zapros govna");
         }
+
+
         ctx.status(200);//авику похуй но типа для логов, хз
         AuthPlayer authPlayer = Config.authPlayers.get(nickname);
         authPlayer.ip = ip;
         authPlayer.timestamp = System.currentTimeMillis();
-
-        if (!Config.passwords.containsKey(nickname))
-            Config.registeredPlayers.add(nickname);
-        Config.passwords.put(nickname, hashedPassword);
     }
 }

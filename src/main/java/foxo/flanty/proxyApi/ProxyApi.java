@@ -66,10 +66,6 @@ public class ProxyApi {
         server.getEventManager().unregisterListeners(this);
         new EventRegistrator(logger,this,server,limboFactory).register();
 
-
-        Config.passwords.clear();
-        Requests.getPasswords().thenAccept(passwords->Config.passwords = passwords);
-
         Config.authPlayers.clear();
 
         CommandManager commandManager = server.getCommandManager();
