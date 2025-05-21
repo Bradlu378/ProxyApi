@@ -70,7 +70,9 @@ public class LimboHandler extends LimboWrapper {
                  .append(miniMessage.deserialize(loginMessage))
                  .append(Component.text(urlPlaceholder)
                          .clickEvent(ClickEvent.openUrl(login.url))
-                         .hoverEvent(showText(Component.text("Перейти на сайт авторизации")))));
+                         .hoverEvent(showText(Component.text("Перейти на сайт авторизации")))
+                 ).appendNewline()
+         );
         tasks.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
                 if (AuthedPlayers.contains(player.getUsername())) {
                     AuthedPlayers.remove(player.getUsername());

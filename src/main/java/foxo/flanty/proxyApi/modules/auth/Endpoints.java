@@ -19,7 +19,6 @@ public class Endpoints {
             ctx.result("Zapros govna");
         }
 
-
         ctx.status(200);
         AuthPlayer authPlayer = Config.authPlayers.get(nickname);
         authPlayer.ip = ip;
