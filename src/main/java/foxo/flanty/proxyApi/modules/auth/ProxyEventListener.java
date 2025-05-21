@@ -7,6 +7,7 @@ import com.velocitypowered.api.event.player.GameProfileRequestEvent;
 import com.velocitypowered.api.proxy.Player;
 import foxo.flanty.proxyApi.ProxyApi;
 import foxo.flanty.proxyApi.settings.Config;
+import foxo.flanty.proxyApi.settings.Language;
 import foxo.flanty.proxyApi.utils.AuthPlayer;
 import io.javalin.http.util.JsonEscapeUtil;
 import net.elytrium.limboapi.api.Limbo;
@@ -45,9 +46,8 @@ public class ProxyEventListener {
     @Subscribe(priority = 32767)
     public void onLogin(LoginLimboRegisterEvent event) {
         Player player = event.getPlayer();
-        Login login = getLoginRequest(player.getUsername(), player.getUniqueId().toString(),player.getRemoteAddress().getAddress().toString()).join();//пошло оно все нахуй, мне поебать
-        System.out.println(login.toString());
-        if (!login.is_whitelisted) player.disconnect(Component.text("You are not whitelisted", NamedTextColor.RED));//опять же поебать будет база
+        Login login = getLoginRequest(player.getUsername(), player.getUniqueId().toString(),player.getRemoteAddress().getAddress().toString()).join();
+        if (!login.is_whitelisted) player.disconnect(Component.text(Language.notInWhitelist));
         if (login.is_logged_in) AuthedPlayers.add(player.getUsername());
         event.addOnJoinCallback(() -> limbo.spawnPlayer(event.getPlayer(), new LimboHandler(proxy, logger, login)));
     }

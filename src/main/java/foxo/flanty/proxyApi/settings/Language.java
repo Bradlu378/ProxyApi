@@ -18,4 +18,5 @@ public class Language {
     public static String skinChangeSuccess = "Скин успешно установлен";//todo добавить сообщения в чат
     public static String wrongCommandSkinUrlType = "<red>Неверный тип скина, Пример: /skin set <url> <slim/classic>";
 
+    public static String notInWhitelist = "Вас нет в вайтлисте!";
 }

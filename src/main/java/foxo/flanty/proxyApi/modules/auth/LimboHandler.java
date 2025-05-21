@@ -11,7 +11,6 @@ import net.elytrium.limboapi.api.player.LimboPlayer;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
 import java.util.concurrent.ScheduledFuture;
@@ -60,15 +59,16 @@ public class LimboHandler extends LimboWrapper {
          //   return;
          //}
          if (AuthedPlayers.contains(player.getUsername())) {
-             limboPlayer.disconnect();//ваще похуй, я строю на костях старой системы
+             limboPlayer.disconnect(); // ваще похуй, я строю на костях старой системы
              AuthedPlayers.remove(player.getUsername());
+             return;
          }
 
          limboPlayer.getProxyPlayer().sendMessage(miniMessage
                  .deserialize(loginWelcome)
                  .appendNewline()
                  .append(miniMessage.deserialize(loginMessage))
-                 .append(Component.text("discord.com")
+                 .append(Component.text(urlPlaceholder)
                          .clickEvent(ClickEvent.openUrl(login.url))
                          .hoverEvent(showText(Component.text("Перейти на сайт авторизации")))));
         tasks.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {

@@ -17,6 +17,7 @@ public class YamlUtils {
                 copyResourceIfNotExists("endpoints.yml", path) &&
                 copyResourceIfNotExists("language.yml", path);
     }
+
     public static boolean copyResourceIfNotExists(String resourceName, Path targetDir) {
         Path targetPath = targetDir.resolve(resourceName);
 
@@ -31,10 +32,11 @@ public class YamlUtils {
         }
         return true;
     }
+
     public static boolean loadConfigs(Path configDir) {
         return loadConfig(configDir.resolve("config.yml")) &&
-        loadEndpoints(configDir.resolve("endpoints.yml")) &&
-        loadLanguage(configDir.resolve("language.yml"));
+                loadEndpoints(configDir.resolve("endpoints.yml")) &&
+                loadLanguage(configDir.resolve("language.yml"));
 
     }
 
@@ -81,6 +83,7 @@ public class YamlUtils {
         Language.skinChangeError = getString(data, "skinChangeError", Language.skinChangeError);
         Language.skinChangeSuccess = getString(data, "skinChangeSuccess", Language.skinChangeSuccess);
         Language.wrongCommandSkinUrlType = getString(data, "wrongCommandSkinUrlType", Language.wrongCommandSkinUrlType);
+        Language.notInWhitelist = getString(data, "notInWhitelist", Language.notInWhitelist);
 
         return true;
     }
