@@ -1,16 +1,14 @@
 package foxo.flanty.proxyApi.utils;
 
 public class AuthPlayer {
+    public boolean online = false;
     public String ip;
     public long timestamp;
-    public String licensedUUID;
-    public long licenseTimestamp;
-    public boolean online = false;
-    public AuthPlayer(String ip, long timestamp, String licensedUUID, long licenseTimestamp) {
+
+
+    public AuthPlayer(String ip, long timestamp, boolean online) {
         this.ip = ip;
         this.timestamp = timestamp;
-        this.licensedUUID = licensedUUID;
-        this.licenseTimestamp = licenseTimestamp;
-
+        this.online = online;
     }
 }
