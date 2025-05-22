@@ -7,14 +7,11 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
-import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import foxo.flanty.proxyApi.commands.Skin;
-import foxo.flanty.proxyApi.modules.auth.Requests;
 import foxo.flanty.proxyApi.commands.Reload;
 import foxo.flanty.proxyApi.settings.Config;
-import net.elytrium.limboapi.api.LimboFactory;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -27,7 +24,6 @@ import static foxo.flanty.proxyApi.settings.YamlUtils.saveConfigs;
 public class ProxyApi {
     private final Logger logger;
     private final ProxyServer server;
-    private final LimboFactory limboFactory;
     private final Path dataDirectory;
     EndpointRegistrator endpoints;
     @Inject
@@ -35,10 +31,6 @@ public class ProxyApi {
         this.logger = logger;
         this.server = server;
 
-        this.limboFactory = (LimboFactory) this.server.getPluginManager()
-                .getPlugin("limboapi")
-                .flatMap(PluginContainer::getInstance)
-                .orElseThrow(() -> new IllegalStateException("LimboAPI не найден!"));
         this.dataDirectory = dataDirectory;
     }
 
@@ -64,13 +56,10 @@ public class ProxyApi {
         }
 
         server.getEventManager().unregisterListeners(this);
-        new EventRegistrator(logger,this,server,limboFactory).register();
+        new EventRegistrator(logger,this,server).register();
 
 
         Config.passwords.clear();
-        Requests.getPasswords().thenAccept(passwords->Config.passwords = passwords);
-
-        Config.authPlayers.clear();
 
         CommandManager commandManager = server.getCommandManager();
         commandManager.unregister("reload");

@@ -12,7 +12,6 @@ public class Config {
     public static ProxyServer proxyServer;
     public static Logger logger;
     public static Map<String,String> passwords = new HashMap<>();
-    public static Map<String, AuthPlayer> authPlayers = new HashMap<>();
     public static Set<String> registeredPlayers = new HashSet<>();
     public static int authTime = 45;
     public static int registerTime = 90;

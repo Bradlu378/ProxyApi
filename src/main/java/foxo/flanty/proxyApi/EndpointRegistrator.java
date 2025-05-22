@@ -23,7 +23,6 @@ public class EndpointRegistrator {
             return;
         app = Javalin.create().start(Config.httpPort);
         app.post("/proxy/set-skin", Endpoints::setSkin);//эндпонит смены скина на стороне api
-        app.put("/proxy/auth/password", foxo.flanty.proxyApi.modules.auth.Endpoints::setPass);//смена пароля/регистрация, 2in1.
     }
     public void disable() {
         if (app != null) {

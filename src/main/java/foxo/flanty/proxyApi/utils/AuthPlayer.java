@@ -5,7 +5,6 @@ public class AuthPlayer {
     public long timestamp;
     public String licensedUUID;
     public long licenseTimestamp;
-    public boolean online = false;
     public AuthPlayer(String ip, long timestamp, String licensedUUID, long licenseTimestamp) {
         this.ip = ip;
         this.timestamp = timestamp;

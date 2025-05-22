@@ -34,11 +34,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.mindrot.bcrypt:bcrypt:0.3'//bcrypt
+    //implementation 'org.mindrot.bcrypt:bcrypt:0.3'//bcrypt
     compileOnly 'net.skinsrestorer:skinsrestorer-api:15.5.2'//skin restorer
     implementation 'org.json:json:20250107'//json :/
     implementation("io.javalin:javalin:6.4.0")//javalin - endpoint framework
-    compileOnly("net.elytrium.limboapi:api:1.1.27")//limboapi
+    //compileOnly("net.elytrium.limboapi:api:1.1.27")//limboapi
     compileOnly "com.velocitypowered:velocity-api:3.4.0-SNAPSHOT"//velocityMain
     annotationProcessor "com.velocitypowered:velocity-api:3.4.0-SNAPSHOT"//velocityAnnotations
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'//http client

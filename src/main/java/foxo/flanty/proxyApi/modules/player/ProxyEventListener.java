@@ -3,14 +3,8 @@ package foxo.flanty.proxyApi.modules.player;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import foxo.flanty.proxyApi.ProxyApi;
-import foxo.flanty.proxyApi.settings.Config;
-import net.elytrium.limboapi.api.Limbo;
-import okhttp3.*;
 import org.slf4j.Logger;
 
-import java.io.IOException;
-
-import static foxo.flanty.proxyApi.settings.Endpoints.playerJoin;
 import static foxo.flanty.proxyApi.utils.SkinRestorer.SRUtils.chechQueue;
 
 public class ProxyEventListener {
