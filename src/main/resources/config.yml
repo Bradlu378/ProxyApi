@@ -1,9 +1,5 @@
-version: 1.0
+authTime: 45 # время на авторизацию в секундах
+bossBar: true # включен или выключен боссбар, с отображением времени
+httpPort: 7000 # порт api
 
-authTime: 45
-registerTime: 90
-bossBar: true
-discordLoggingEnabled: true
-loginAttempts: 3
-loginSessionTime: 12
-httpPort: 7000
+uuidGenerateKey: "super_secret_key" # ключ для генерации uuid

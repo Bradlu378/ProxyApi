@@ -1,4 +1,4 @@
-package foxo.flanty.proxyApi.modules.auth;
+package foxo.flanty.proxyApi.auth;
 
 import foxo.flanty.proxyApi.settings.Config;
 import okhttp3.*;

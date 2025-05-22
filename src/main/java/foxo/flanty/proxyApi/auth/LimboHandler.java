@@ -1,18 +1,19 @@
-package foxo.flanty.proxyApi.modules.auth;
+package foxo.flanty.proxyApi.auth;
 
 import com.velocitypowered.api.proxy.Player;
-import foxo.flanty.proxyApi.ProxyApi;
+import foxo.flanty.proxyApi.Auth;
+import foxo.flanty.proxyApi.settings.Language;
 import foxo.flanty.proxyApi.utils.LimboWrapper;
 import foxo.flanty.proxyApi.settings.Config;
-import foxo.flanty.proxyApi.utils.AuthPlayer;
-import foxo.flanty.proxyApi.utils.message.Style;
 import net.elytrium.limboapi.api.Limbo;
 import net.elytrium.limboapi.api.player.LimboPlayer;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
+
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -25,8 +26,9 @@ public class LimboHandler extends LimboWrapper {
     private Player player;
     MiniMessage miniMessage;
     Login login;
-    public LimboHandler(ProxyApi plugin, Logger logger, Login login) {//логер и плагин шото здесь нахуй не сдались, ну и ладно. UPDATE АПХАХВПХАВХПАВХПХ ПОХУЙ
-    this.login = login;
+
+    public LimboHandler(Auth plugin, Logger logger, Login login) {
+        this.login = login;
     }
 
     @Override
@@ -39,12 +41,12 @@ public class LimboHandler extends LimboWrapper {
     }
 
     private void authTime(long time) {
-        BossBar bossBar = BossBar.bossBar(miniMessage.deserialize(bossBarName), 1.0f, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
+        BossBar bossBar = BossBar.bossBar(miniMessage.deserialize(bossBarName), 1.0f, BossBar.Color.valueOf(bossBarColor), BossBar.Overlay.PROGRESS);
         if (Config.bossBar) player.showBossBar(bossBar);
         long joinTime = System.currentTimeMillis();
         tasks.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
-            if (System.currentTimeMillis() - joinTime > time*1000)
-                player.disconnect(Style.RED.style(loginTimeOut));
+            if (System.currentTimeMillis() - joinTime > time * 1000)
+                player.disconnect(miniMessage.deserialize(loginTimeOut));
             else
                 bossBar.progress(Math.max(0.0f, bossBar.progress() - (1.0f / time)));
         }, 0, 1, TimeUnit.SECONDS));
@@ -52,32 +54,26 @@ public class LimboHandler extends LimboWrapper {
 
     private void needLogin() {
         authTime(Config.authTime);
-        AuthPlayer authPlayer = Config.authPlayers.get(player.getUsername());
-         //if (authPlayer.ip.equals(player.getRemoteAddress().getAddress().toString()) && (System.currentTimeMillis() - authPlayer.timestamp) < Config.loginSessionTime*3600000L) {
-         //   limboPlayer.disconnect();
-         //   authPlayer.timestamp = System.currentTimeMillis();
-         //   return;
-         //}
-         if (AuthedPlayers.contains(player.getUsername())) {
-             limboPlayer.disconnect(); // ваще похуй, я строю на костях старой системы
-             AuthedPlayers.remove(player.getUsername());
-             return;
-         }
+        if (AuthedPlayers.contains(player.getUsername())) {
+            limboPlayer.disconnect();
+            AuthedPlayers.remove(player.getUsername());
+            return;
+        }
 
-         limboPlayer.getProxyPlayer().sendMessage(miniMessage
-                 .deserialize(loginWelcome)
-                 .appendNewline()
-                 .append(miniMessage.deserialize(loginMessage))
-                 .append(Component.text(urlPlaceholder)
-                         .clickEvent(ClickEvent.openUrl(login.url))
-                         .hoverEvent(showText(Component.text("Перейти на сайт авторизации")))
-                 ).appendNewline()
-         );
+        Component urlComponent = miniMessage.deserialize(urlPlaceholder)
+                .clickEvent(ClickEvent.openUrl(login.url))
+                .hoverEvent(showText(miniMessage.deserialize(urlHoverText)));
+
+        Component component = miniMessage.deserialize(loginWelcome)
+                .appendNewline()
+                .append(miniMessage.deserialize(loginMessage));
+
+        limboPlayer.getProxyPlayer().sendMessage(component.replaceText("%url%", urlComponent));
         tasks.add(limboPlayer.getScheduledExecutor().scheduleAtFixedRate(() -> {
-                if (AuthedPlayers.contains(player.getUsername())) {
-                    AuthedPlayers.remove(player.getUsername());
-                    limboPlayer.disconnect();
-                }
+            if (AuthedPlayers.contains(player.getUsername())) {
+                AuthedPlayers.remove(player.getUsername());
+                limboPlayer.disconnect();
+            }
         }, 0, 1, TimeUnit.SECONDS));
     }
 

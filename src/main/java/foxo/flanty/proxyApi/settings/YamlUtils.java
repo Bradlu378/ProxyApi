@@ -45,12 +45,9 @@ public class YamlUtils {
         if (data == null) return false;
 
         Config.authTime = getInt(data, "authTime", Config.authTime);
-        Config.registerTime = getInt(data, "registerTime", Config.registerTime);
         Config.bossBar = getBoolean(data, "bossBar", Config.bossBar);
-        Config.discordLoggingEnabled = getBoolean(data, "discordLoggingEnabled", Config.discordLoggingEnabled);
-        Config.loginAttempts = getInt(data, "loginAttempts", Config.loginAttempts);
-        Config.loginSessionTime = getInt(data, "loginSessionTime", Config.loginSessionTime);
         Config.httpPort = getInt(data, "httpPort", Config.httpPort);
+        Config.uuidGenerateKey = getString(data, "uuidGenerateKey", Config.uuidGenerateKey);
         return true;
     }
 
@@ -58,9 +55,8 @@ public class YamlUtils {
         Map<String, Object> data = loadYaml(path);
         if (data == null) return false;
 
-        Endpoints.MojangAPI = getString(data, "MojangAPI", Endpoints.MojangAPI);
-        Endpoints.skinUpdate = getString(data, "skinUpdate", Endpoints.skinUpdate);
-        Endpoints.playerJoin = getString(data, "playerJoin", Endpoints.playerJoin);
+        Endpoints.loginEndpoint = getString(data, "loginEndpoint", Endpoints.loginEndpoint);
+        Endpoints.logoutEndpoint = getString(data, "logoutEndpoint", Endpoints.logoutEndpoint);
         Endpoints.playerLoginRequest = getString(data, "playerLoginRequest", Endpoints.playerLoginRequest);
 
         return true;
@@ -71,20 +67,15 @@ public class YamlUtils {
         if (data == null) return false;
 
         Language.bossBarName = getString(data, "bossBarName", Language.bossBarName);
+        Language.bossBarColor = getString(data, "bossBarColor", Language.bossBarColor);
         Language.loginTimeOut = getString(data, "loginTimeOut", Language.loginTimeOut);
-        Language.registerMessage = getString(data, "registerMessage", Language.registerMessage);
+        Language.logoutReason = getString(data, "logoutReason", Language.logoutReason);
         Language.urlPlaceholder = getString(data, "urlPlaceholder", Language.urlPlaceholder);
+        Language.urlHoverText = getString(data, "urlHoverText", Language.urlHoverText);
         Language.loginWelcome = getString(data, "loginWelcome", Language.loginWelcome);
         Language.loginMessage = getString(data, "loginMessage", Language.loginMessage);
-        Language.wrongCommand = getString(data, "wrongCommand", Language.wrongCommand);
-        Language.wrongPassword = getString(data, "wrongPassword", Language.wrongPassword);
-        Language.loginAttemptsOut = getString(data, "loginAttemptsOut", Language.loginAttemptsOut);
-        Language.commandDelay = getString(data, "commandDelay", Language.commandDelay);
-        Language.skinChangeError = getString(data, "skinChangeError", Language.skinChangeError);
-        Language.skinChangeSuccess = getString(data, "skinChangeSuccess", Language.skinChangeSuccess);
-        Language.wrongCommandSkinUrlType = getString(data, "wrongCommandSkinUrlType", Language.wrongCommandSkinUrlType);
         Language.notInWhitelist = getString(data, "notInWhitelist", Language.notInWhitelist);
-
+        Language.reloadMessage = getString(data, "reloadMessage", Language.reloadMessage);
         return true;
     }
 

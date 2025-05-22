@@ -1,26 +1,22 @@
-version: 1.0
-# Proxy api language.yml v1.0
-# MiniMessage
+# Форматирование MiniMessage
 #   styles: <bold>, <italic>, <underlined>, <strikethrough>, <obfuscated>,<reset>
 #   colors: <black>, <dark_blue>, <dark_green>, <dark_aqua>, <dark_red>, <dark_purple>, <gold>, <gray>,
 #           <dark_gray>, <blue>, <green>, <aqua>, <red>, <light_purple>, <yellow>, <white>. #E14585
 #   hex example: "<#RRGGBB> test message"
 #   gradient example: "<gradient:#RRGGBB:#RRGGBB>test gradient message</gradient>"
 
-bossBarName: "<yellow>⌚"
-loginTimeOut: "Время ожидания вышло"
+bossBarName: "⌚"
+bossBarColor: PURPLE
+# PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
 
-registerMessage: "Для регистрации перейдите по"
-urlPlaceholder: "[ссылке]"
+loginWelcome: "Добро пожаловать на сервер"
+loginMessage: "Перейдите по ссылке: %url%"
 
-loginWelcome: "<#E14585>Добро пожаловать на Leafcity"
-loginMessage: "<dark_aqua>Перейдите по ссылке: "
+urlPlaceholder: "[discord]"
+urlHoverText: "Перейти на сайт авторизации"
+
 notInWhitelist: "Вас нет в вайтлисте!"
-wrongCommand: "Неверная команда, пример: "
-loginCommandExample: "/login <пароль>"
-wrongPassword: "Неверный пароль"
-loginAttemptsOut: "Превышен лимит попыток входа"
-commandDelay: "Подождите перед следующим вводом!"
-skinChangeError: "<red>Произошла ошибка при смене скина, попробуйте позже"
-skinChangeSuccess: "Скин успешно установлен"
-wrongCommandSkinUrlType: "<red>Неверный тип скина, Пример: /skin set <url> <slim/classic>"
+loginTimeOut: "Время ожидания вышло"
+logoutReason: "Вы были удалены из вайтлиста!"
+
+reloadMessage: "Конфигурация перезагружена"

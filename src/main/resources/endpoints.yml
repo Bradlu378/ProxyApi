@@ -1,6 +1,4 @@
-MojangAPI: "https://api.minecraftservices.com/minecraft/profile/lookup/"
-skinUpdate: "http://127.0.0.1:8000/api/skins/{nickname}/minecraft" # PUT
-playerPasswordsHashes: "http://127.0.0.1:8000/api/passwords" # GET
-playerLoginRequest: "http://127.0.0.1:8000/api/auth/login" # GET ?username=nickname
-discordLogger: "http://127.0.0.1:8000/api/notify/log" # POST //channel, level, location, message
-playerJoin: "http://127.0.0.1:8000/api/notify/player-join"
+loginEndpoint: "/proxy/auth/login" # путь до ручки login самого плагина
+logoutEndpoint: "/proxy/auth/logout" # путь до ручки logout самого плагина
+
+playerLoginRequest: "http://auth_api:8000/api/auth/login" # api эндпоинт
