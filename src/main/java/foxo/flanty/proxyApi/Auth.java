@@ -10,6 +10,8 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import foxo.flanty.proxyApi.commands.Skin;
+import foxo.flanty.proxyApi.modules.auth.Requests;
 import foxo.flanty.proxyApi.commands.Reload;
 import foxo.flanty.proxyApi.settings.Config;
 import net.elytrium.limboapi.api.LimboFactory;
@@ -21,24 +23,15 @@ import java.nio.file.Path;
 import static foxo.flanty.proxyApi.settings.YamlUtils.loadConfigs;
 import static foxo.flanty.proxyApi.settings.YamlUtils.saveConfigs;
 
-@Plugin(
-        id = "auth",
-        name = "Auth",
-        version = BuildConstants.VERSION,
-        authors = {"Flanty", "wertiko"},
-        dependencies = {
-                @Dependency(id = "limboapi")
-        }
-)
-public class Auth {
+@Plugin(id = "proxyapi", name = "ProxyApi", version = BuildConstants.VERSION, authors = {"Flanty"}, dependencies = {@Dependency(id = "limboapi"), @Dependency(id = "skinsrestorer")})
+public class ProxyApi {
     private final Logger logger;
     private final ProxyServer server;
     private final LimboFactory limboFactory;
     private final Path dataDirectory;
     EndpointRegistrator endpoints;
-
     @Inject
-    public Auth(Logger logger, ProxyServer server, @DataDirectory Path dataDirectory) {
+    public ProxyApi(Logger logger, ProxyServer server, @DataDirectory Path dataDirectory) {
         this.logger = logger;
         this.server = server;
 
@@ -51,7 +44,7 @@ public class Auth {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) throws IOException, InterruptedException {
-        endpoints = new EndpointRegistrator(logger, this, server);
+        endpoints = new EndpointRegistrator(logger,this,server);
         endpoints.enable();
         reload();
     }
@@ -71,15 +64,16 @@ public class Auth {
         }
 
         server.getEventManager().unregisterListeners(this);
-        new EventRegistrator(logger, this, server, limboFactory).register();
+        new EventRegistrator(logger,this,server,limboFactory).register();
 
         Config.authPlayers.clear();
 
         CommandManager commandManager = server.getCommandManager();
-        commandManager.unregister("authreload");
-        commandManager.register("authreload", new Reload());
+        commandManager.unregister("reload");
+        commandManager.register("reload", new Reload());
+        commandManager.unregister("skin");
+        commandManager.register("skin", new Skin());
     }
-
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         endpoints.disable();
