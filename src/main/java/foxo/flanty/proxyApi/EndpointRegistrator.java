@@ -6,6 +6,8 @@ import foxo.flanty.proxyApi.settings.Config;
 import io.javalin.Javalin;
 import org.slf4j.Logger;
 
+import static foxo.flanty.proxyApi.settings.Endpoints.skinSet;
+
 public class EndpointRegistrator {
     Logger logger;
     ProxyApi proxyApi;
@@ -21,14 +23,20 @@ public class EndpointRegistrator {
     public void enable() {
         if (app != null)
             return;
-        app = Javalin.create().start(Config.httpPort);
-        app.post("/proxy/set-skin", Endpoints::setSkin);//эндпонит смены скина на стороне api
+        try {
+            app = Javalin.create().start(Config.httpPort);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        app.post(skinSet, Endpoints::setSkin);
     }
+
     public void disable() {
         if (app != null) {
-                app.jettyServer().stop();
-                app.stop();
-                app = null;
+            app.jettyServer().stop();
+            app.stop();
+            app = null;
         }
     }
 }

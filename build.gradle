@@ -11,44 +11,38 @@ version = '1.0-SNAPSHOT'
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {//velocity
+    maven {
         name = "papermc-repo"
         url = "https://repo.papermc.io/repository/maven-public/"
     }
-    maven {//limbo
-        name = "elytrium-repo"
-        url = "https://maven.elytrium.net/repo/"
-    }
-    maven {//skin restorer
+    maven {
         name 'codemc'
         url 'https://repo.codemc.io/repository/maven-public/'
     }
-    maven {//stuff
+    maven {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
-    maven {//stuff
+    maven {
         name = "BeDataDriven"
         url = "https://nexus.bedatadriven.com/content/groups/public/"
     }
 }
 
 dependencies {
-    //implementation 'org.mindrot.bcrypt:bcrypt:0.3'//bcrypt
-    compileOnly 'net.skinsrestorer:skinsrestorer-api:15.5.2'//skin restorer
-    implementation 'org.json:json:20250107'//json :/
-    implementation("io.javalin:javalin:6.4.0")//javalin - endpoint framework
-    //compileOnly("net.elytrium.limboapi:api:1.1.27")//limboapi
-    compileOnly "com.velocitypowered:velocity-api:3.4.0-SNAPSHOT"//velocityMain
-    annotationProcessor "com.velocitypowered:velocity-api:3.4.0-SNAPSHOT"//velocityAnnotations
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'//http client
+    compileOnly 'net.skinsrestorer:skinsrestorer-api:15.5.2' // skin restorer
+    implementation 'org.json:json:20250107' // json
+    implementation("io.javalin:javalin:6.4.0") // javalin - endpoint framework
+    compileOnly "com.velocitypowered:velocity-api:3.4.0-SNAPSHOT" // velocityMain
+    annotationProcessor "com.velocitypowered:velocity-api:3.4.0-SNAPSHOT" // velocityAnnotations
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0' // http client
 }
 
 shadowJar {
     dependencies {
         exclude(dependency("org.slf4j:slf4j-api"))
     }
-    getArchiveClassifier().set("")//same jar name for shadow
+    getArchiveClassifier().set("")
 }
 
 def targetJavaVersion = 21

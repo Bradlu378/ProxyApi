@@ -1,4 +1,4 @@
-package foxo.flanty.proxyApi.utils.SkinRestorer;
+package foxo.flanty.proxyApi.SkinRestorer;
 
 import com.velocitypowered.api.proxy.Player;
 import foxo.flanty.proxyApi.settings.Config;
@@ -39,11 +39,11 @@ public class SRUtils {
         try {
             skin = api.getMineSkinAPI().genSkin(skinUrl, variant).getProperty();
         } catch (MineSkinException | DataRequestException e) {
-            return SRCode.SKIN_SET_ERROR;//ссылка говна/рейт лимит
+            return SRCode.SKIN_SET_ERROR;
         }
         if (player.isEmpty()) {
             skinQueue.put(nickname, skin);
-            return SRCode.NO_PLAYER;//игрока нет
+            return SRCode.NO_PLAYER;
         }
 
         saveSkin(player.get());
@@ -75,11 +75,11 @@ public class SRUtils {
         Optional<Player> player = Config.proxyServer.getPlayer(nickname);
 
         Optional<MojangSkinDataResult> skin = api.getMojangAPI().getSkin(skinNickname);
-        if (skin.isEmpty()) return SRCode.SKIN_SET_ERROR;//ошибка при получении скина по нику, not exist/rateLimit
+        if (skin.isEmpty()) return SRCode.SKIN_SET_ERROR;
 
         if (player.isEmpty()) {
-            skinQueue.put(player.get().getUsername(),skin.get().getSkinProperty());
-            return SRCode.NO_PLAYER;//игрока нет
+            skinQueue.put(player.get().getUsername(), skin.get().getSkinProperty());
+            return SRCode.NO_PLAYER;
         }
 
         saveSkin(player.get());
@@ -95,7 +95,7 @@ public class SRUtils {
      * @return String[2]{Url, SkinVariant, skinHash}
      * 0 - Url to skin png
      * 1 - skin type (SLIM/CLASSIC)
-     * 2 - skin hash (http://textures.minecraft.net/texture/ "7fd9ba42a7c81eeea22f1524271ae85a8e045ce0af5a6ae16c6406ae917e68b5" )
+     * 2 - skin hash ("7fd9ba42a7c81eeea22f1524271ae85a8e045ce0af5a6ae16c6406ae917e68b5")
      */
     public static String[] textureDecode(String base64) {
         String json = new String(java.util.Base64.getDecoder().decode(base64));
@@ -116,11 +116,11 @@ public class SRUtils {
     private static void saveSkin(Player player) {
         Optional<SkinProperty> skinProperty = api.getPlayerStorage().getSkinOfPlayer(player.getUniqueId());
         if (skinProperty.isEmpty())
-            skinProperty = Optional.of(SkinProperty.of("1", "1"));//если у чела нет скина ставится 1 для базового
+            skinProperty = Optional.of(SkinProperty.of("1", "1"));
         lastSkin.put(player.getUsername(), skinProperty.get());
     }
 
-    public static void chechQueue(String player) {
+    public static void checkQueue(String player) {
         if (skinQueue.containsKey(player)) {
             applySkin(player, skinQueue.get(player));
             skinQueue.remove(player);
@@ -137,7 +137,7 @@ public class SRUtils {
     private static SRCode applySkin(String nickname, SkinProperty property) {
 
         Optional<Player> player = Config.proxyServer.getPlayer(nickname);
-        if (player.isEmpty()) return SRCode.NO_PLAYER;//игрока нет
+        if (player.isEmpty()) return SRCode.NO_PLAYER;
 
         SkinStorage skinStorage = api.getSkinStorage();
 
@@ -150,7 +150,7 @@ public class SRUtils {
 
         try {
             api.getSkinApplier(Player.class).applySkin(player.get());
-        } catch (DataRequestException e) {//хуй знает что тут
+        } catch (DataRequestException e) {
             Config.logger.error(e.getMessage());
             return SRCode.SKIN_SET_ERROR;
         }

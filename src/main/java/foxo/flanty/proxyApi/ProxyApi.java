@@ -20,12 +20,22 @@ import java.nio.file.Path;
 import static foxo.flanty.proxyApi.settings.YamlUtils.loadConfigs;
 import static foxo.flanty.proxyApi.settings.YamlUtils.saveConfigs;
 
-@Plugin(id = "proxyapi", name = "ProxyApi", version = BuildConstants.VERSION, authors = {"Flanty"}, dependencies = {@Dependency(id = "limboapi"), @Dependency(id = "skinsrestorer")})
+@Plugin(
+        id = "skins",
+        name = "Skins",
+        version = BuildConstants.VERSION,
+        authors = {"Flanty", "wertiko"},
+        dependencies = {
+                @Dependency(id = "limboapi"),
+                @Dependency(id = "skinsrestorer")
+        }
+)
 public class ProxyApi {
     private final Logger logger;
     private final ProxyServer server;
     private final Path dataDirectory;
     EndpointRegistrator endpoints;
+
     @Inject
     public ProxyApi(Logger logger, ProxyServer server, @DataDirectory Path dataDirectory) {
         this.logger = logger;
@@ -36,7 +46,7 @@ public class ProxyApi {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) throws IOException, InterruptedException {
-        endpoints = new EndpointRegistrator(logger,this,server);
+        endpoints = new EndpointRegistrator(logger, this, server);
         endpoints.enable();
         reload();
     }
@@ -56,17 +66,16 @@ public class ProxyApi {
         }
 
         server.getEventManager().unregisterListeners(this);
-        new EventRegistrator(logger,this,server).register();
+        new EventRegistrator(logger, this, server).register();
 
-
-        Config.passwords.clear();
 
         CommandManager commandManager = server.getCommandManager();
-        commandManager.unregister("reload");
-        commandManager.register("reload", new Reload());
+        commandManager.unregister("skinsreload");
+        commandManager.register("skinsreload", new Reload());
         commandManager.unregister("skin");
         commandManager.register("skin", new Skin());
     }
+
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         endpoints.disable();

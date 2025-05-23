@@ -23,8 +23,6 @@ public class EventRegistrator {
 
     public void register() {
         eventManager = server.getEventManager();
-
-
         eventManager.register(proxyApi, new foxo.flanty.proxyApi.modules.player.ProxyEventListener(proxyApi,logger));
         SkinsRestorerProvider.get().getEventBus().subscribe(proxyApi, SkinApplyEvent.class, new ProxyEventListener()::onSkinApply);
 

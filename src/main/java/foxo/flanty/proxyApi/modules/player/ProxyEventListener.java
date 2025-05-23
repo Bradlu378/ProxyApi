@@ -5,11 +5,12 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import foxo.flanty.proxyApi.ProxyApi;
 import org.slf4j.Logger;
 
-import static foxo.flanty.proxyApi.utils.SkinRestorer.SRUtils.chechQueue;
+import static foxo.flanty.proxyApi.SkinRestorer.SRUtils.checkQueue;
 
 public class ProxyEventListener {
     private ProxyApi proxy;
     private Logger logger;
+
     public ProxyEventListener(ProxyApi proxy, Logger logger) {
         this.proxy = proxy;
         this.logger = logger;
@@ -19,29 +20,6 @@ public class ProxyEventListener {
     public void onPlayerJoin(PostLoginEvent event) {
         com.velocitypowered.api.proxy.Player player = event.getPlayer();
         if (player == null) return;
-        chechQueue(player.getUsername());
-
-        //String playerName = player.getUsername();
-        //String json = String.format("{\"player\": \"%s\"}", playerName);
-//
-        //OkHttpClient client = new OkHttpClient();
-        //RequestBody body = RequestBody.create(json, MediaType.get("application/json; charset=utf-8"));
-        //Request request = new Request.Builder().url(playerJoin).put(body).build();
-//
-        //client.newCall(request).enqueue(new Callback() {
-        //    @Override
-        //    public void onFailure(Call call, IOException e) {
-        //        Config.logger.error("Failed to send join event: " + e.getMessage(), e);
-        //    }
-//
-        //    @Override
-        //    public void onResponse(Call call, Response response) {
-        //        if (response.isSuccessful()) {
-        //            Config.logger.info("Player join event sent successfully");
-        //        } else {
-        //            Config.logger.info("Failed to send join event: " + response.code());
-        //        }
-        //    }
-        //});
+        checkQueue(player.getUsername());
     }
 }

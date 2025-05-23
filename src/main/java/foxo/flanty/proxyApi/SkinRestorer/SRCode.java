@@ -1,4 +1,4 @@
-package foxo.flanty.proxyApi.utils.SkinRestorer;
+package foxo.flanty.proxyApi.SkinRestorer;
 
 public enum SRCode {
     OK,

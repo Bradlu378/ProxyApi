@@ -1,6 +1,6 @@
 package foxo.flanty.proxyApi.modules.skins;
 
-import foxo.flanty.proxyApi.utils.SkinRestorer.SRUtils;
+import foxo.flanty.proxyApi.SkinRestorer.SRUtils;
 import io.javalin.http.Context;
 import net.skinsrestorer.api.property.SkinProperty;
 import net.skinsrestorer.api.property.SkinVariant;
